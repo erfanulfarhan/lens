@@ -36,6 +36,13 @@ describe('shortcutList', () => {
     expect(list[0].keys).toBe('Ctrl+Shift+J')
   })
 
+  it('joins modifiers the platform way, with no stray separators', () => {
+    const mac = shortcutList('mac').find((s) => s.action.startsWith('New line'))!
+    expect(mac.keys).toBe('⇧↵')
+    const win = shortcutList('windows').find((s) => s.action.startsWith('New line'))!
+    expect(win.keys).toBe('Shift+Enter')
+  })
+
   it('gives every entry an action and a scope', () => {
     for (const s of shortcutList('mac')) {
       expect(s.action.length).toBeGreaterThan(0)

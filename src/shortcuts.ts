@@ -48,6 +48,6 @@ export function shortcutList(platform: Platform, askAccelerator = 'CommandOrCont
     { keys: f('CommandOrControl+Shift+H'), action: 'Show or hide the panel', scope: 'global' },
     { keys: f('Escape'), action: 'Hide the panel', scope: 'panel' },
     { keys: f('Enter'), action: 'Send your message', scope: 'panel' },
-    { keys: `${f('Shift')}+${f('Enter')}`, action: 'New line instead of sending', scope: 'panel' },
+    { keys: f('Shift+Enter'), action: 'New line instead of sending', scope: 'panel' },
   ]
 }
