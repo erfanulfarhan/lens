@@ -14,10 +14,22 @@ export async function captureScreenshots(panel: BrowserWindow, outDir: string): 
 
   const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-  const shot = async (name: string) => {
+  // Opening the history sidebar resizes the window, so the size is re-asserted
+  // before every capture rather than only once at the start.
+  const big = (width: number, height: number) => {
+    panel.setSize(width, height, false)
+    panel.center()
+  }
+
+  // Heights are chosen per view so the content fills the frame: a tall window
+  // around a short answer leaves dead space that reads as an unfinished app.
+  const shot = async (name: string, width = 1120, height = 660) => {
+    big(width, height)
+    await wait(500)
     const image = await panel.capturePage()
     await writeFile(join(outDir, `${name}.png`), image.toPNG())
-    console.log(`[shots] ${name}.png`)
+    const size = image.getSize()
+    console.log(`[shots] ${name}.png ${size.width}x${size.height}`)
   }
 
   /** Drives the interface the way a user would, by clicking its buttons. */
@@ -28,6 +40,9 @@ export async function captureScreenshots(panel: BrowserWindow, outDir: string): 
     await wait(700)
   }
 
+  // A bigger window means genuinely more pixels, which survives the recompression
+  // social sites apply. The default panel is small because it is an overlay.
+  big(1120, 660)
   panel.show()
   await wait(2500)
 
@@ -44,11 +59,11 @@ export async function captureScreenshots(panel: BrowserWindow, outDir: string): 
 
   await click('button[title="Chat history"]')
   await wait(900)
-  await shot('03-history')
+  await shot('03-history', 1360, 720)  // wider and taller: it holds the sidebar too
   await click('button[title="Chat history"]')
 
   await click('button[title="Settings"]')
-  await shot('04-settings')
+  await shot('04-settings', 900, 900)  // settings is a tall list
 
   console.log('[shots] done')
 }
