@@ -454,6 +454,14 @@ app.whenReady().then(async () => {
     pushStatus()
   })
 
+  // Documentation capture, off unless explicitly requested.
+  if (process.env.LENS_SHOTS) {
+    const { captureScreenshots } = await import('./dev/screenshots.js')
+    panel.once('ready-to-show', () => {
+      void captureScreenshots(panel!, process.env.LENS_SHOTS!).finally(() => app.quit())
+    })
+  }
+
   askShortcut = registerFirst(ASK_SHORTCUTS, () => {
     void captureForCommand()
   })

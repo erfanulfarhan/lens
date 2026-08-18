@@ -6,6 +6,7 @@ import { Readout } from './components/Readout.js'
 import { SettingsPanel } from './components/SettingsPanel.js'
 import { Thinking } from './components/Thinking.js'
 import { Logo } from './components/Logo.js'
+import { Markdown } from './components/Markdown.js'
 import { Transcript } from './components/Transcript.js'
 import { detectPlatform, formatAccelerator } from './shortcuts.js'
 import { Onboarding } from './components/Onboarding.js'
@@ -325,16 +326,20 @@ export default function App() {
             ) : (
               <div key={t.id}>
                 {t.text ? (
-                  <p
-                    className={
-                      'whitespace-pre-wrap text-[13px] leading-relaxed ' +
-                      (t.error ? 'text-red-400' : 'text-paper') +
-                      // The caret trails only the answer still being written.
-                      (streaming && !t.done && !t.error ? ' caret' : '')
-                    }
-                  >
-                    {t.text}
-                  </p>
+                  t.error ? (
+                    <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-red-400">
+                      {t.text}
+                    </p>
+                  ) : (
+                    // Models answer in markdown; rendering it as plain text left
+                    // raw asterisks on screen.
+                    <Markdown
+                      text={t.text}
+                      className={
+                        'text-paper' + (streaming && !t.done ? ' caret-host' : '')
+                      }
+                    />
+                  )
                 ) : (
                   <Thinking reasoning={reasoning} />
                 )}

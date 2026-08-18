@@ -69,6 +69,7 @@ body {
   0%, 45%  { opacity: 1; }
   55%, 100% { opacity: 0; }
 }
+.caret-host > :last-child::after,
 .caret::after {
   content: "";
   display: inline-block;
@@ -88,7 +89,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   /* No pulsing; hold a steady mid state so the indicator still reads as active. */
   [style*="lens-bar"] { animation: none !important; height: 9px !important; opacity: 0.8 !important; }
-  .caret::after { animation: none !important; opacity: 1; }
+  .caret-host > :last-child::after,
+.caret::after { animation: none !important; opacity: 1; }
   [style*="lens-fade"] { animation: none !important; }
 }
 

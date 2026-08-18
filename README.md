@@ -7,7 +7,15 @@ on, and answers using documents you give it. The model can run locally through
 [Ollama](https://ollama.com), so there is no subscription and nothing leaves your
 computer. If you already own an API key, it uses that instead.
 
-<!-- Add a screenshot here once you have one you like. -->
+<p align="center">
+  <img src="docs/screenshots/03-history.png" width="820" alt="Lens answering a question, with the chat history sidebar open"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/04-settings.png" width="420" alt="Settings: choose a provider, add an API key, view shortcuts"/>
+  &nbsp;
+  <img src="docs/screenshots/01-empty.png" width="420" alt="The Lens panel, ready for a question"/>
+</p>
 
 ## Why
 
