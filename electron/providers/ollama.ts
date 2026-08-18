@@ -151,7 +151,20 @@ export class OllamaProvider implements Provider {
       }
     }
 
-    if (!res.ok || !res.body) throw new Error(`${this.name} returned ${res.status}: ${await res.text()}`)
+    if (!res.ok || !res.body) {
+      const body = await res.text()
+      if (res.status === 404 && /not found/i.test(body)) {
+        const installed = await this.listModels().catch(() => [] as string[])
+        const available = installed.length
+          ? `Models on that server: ${installed.join(', ')}.`
+          : 'That server has no models installed yet.'
+        throw new Error(
+          `"${model}" is not installed on the Ollama server at ${this.opts.baseUrl}. ` +
+            `${available} Pick another model above, or run: ollama pull ${model}`
+        )
+      }
+      throw new Error(`${this.name} returned ${res.status}: ${body}`)
+    }
 
     let full = ''
     const reader = res.body.getReader()

@@ -35,7 +35,9 @@ exports.default = async function afterPack(context) {
       console.log('  • ad-hoc signed the audio helper')
     }
     // --deep so the Electron Framework and helper apps inside are covered too.
-    sign(appPath, ['--deep'])
+    // The identifier carries the author's name; note this is attribution only, as
+    // an ad-hoc signature cannot attest identity the way a Developer ID does.
+    sign(appPath, ['--deep', '--identifier', 'dev.lens.app.erfanulfarhan'])
     console.log('  • ad-hoc signed', appName)
 
     execFileSync('codesign', ['--verify', '--verbose=1', appPath], { stdio: 'inherit' })

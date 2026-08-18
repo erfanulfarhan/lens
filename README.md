@@ -56,18 +56,39 @@ The installers are not code-signed yet. On macOS, right-click the app and choose
    ```
 3. Start Lens. It finds Ollama automatically.
 
-**Using another machine's GPU.** Set `OLLAMA_HOST=0.0.0.0:11434` on the machine
-with the GPU, open port 11434, then point Lens at `http://<that-ip>:11434` in
-Settings. Inference runs there while the panel stays on your laptop.
+**Using another machine's GPU.** On the machine with the GPU:
+
+```powershell
+# Windows, in PowerShell as Administrator
+setx OLLAMA_HOST "0.0.0.0:11434"
+New-NetFirewallRule -DisplayName "Ollama" -Direction Inbound -Protocol TCP -LocalPort 11434 -Action Allow
+```
+
+```bash
+# macOS or Linux
+export OLLAMA_HOST=0.0.0.0:11434
+```
+
+Restart Ollama, find that machine's IP (`ipconfig` or `ifconfig`), then set
+**Settings → Model server** in Lens to `http://<that-ip>:11434`. Inference runs
+there while the panel stays on your laptop.
+
+If a model is missing, Lens now names the server and lists what is installed on
+it, rather than reporting a bare 404.
 
 ## Shortcuts
 
-| Shortcut | Action |
-|---|---|
-| `⌘⇧Space` | Capture the screen, then say what to do with it |
-| `⌘⇧H` | Show or hide the panel |
-| `Esc` | Hide the panel |
-| `Enter` | Send · `⇧Enter` for a new line |
+| macOS | Windows and Linux | Action |
+|---|---|---|
+| `⌘⇧Space` | `Ctrl+Shift+Space` | Capture the screen, then say what to do with it |
+| `⌘⇧H` | `Ctrl+Shift+H` | Show or hide the panel |
+| `Esc` | `Esc` | Hide the panel |
+| `↵` | `Enter` | Send |
+| `⇧↵` | `Shift+Enter` | New line instead of sending |
+
+The app shows this list for your own platform under **Settings → Shortcuts**. If
+another app already owns the capture shortcut, Lens registers the next one
+available and the list reflects what was actually registered.
 
 ## Your data
 
@@ -105,4 +126,4 @@ Tests that need a live model or the internet are skipped unless `LENS_LIVE=1`.
 
 ## Licence
 
-MIT
+MIT © Erfanul Hakim Farhan

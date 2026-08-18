@@ -7,6 +7,7 @@ import { SettingsPanel } from './components/SettingsPanel.js'
 import { Thinking } from './components/Thinking.js'
 import { Logo } from './components/Logo.js'
 import { Transcript } from './components/Transcript.js'
+import { detectPlatform, formatAccelerator } from './shortcuts.js'
 import { Onboarding } from './components/Onboarding.js'
 
 interface Turn {
@@ -31,6 +32,7 @@ export default function App() {
   const [onboarding, setOnboarding] = useState(() => localStorage.getItem('lens-onboarded') !== 'yes')
   const [noKnowledge, setNoKnowledge] = useState(false)
   const [loadingModel, setLoadingModel] = useState<string | null>(null)
+  const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434')
   const [input, setInput] = useState('')
   const [screenAttached, setScreenAttached] = useState(false)
   const [lines, setLines] = useState<TranscriptLine[]>([])
@@ -46,6 +48,10 @@ export default function App() {
     void window.lens.listModels().then(setModels).catch(() => setModels([]))
     void window.lens.listKnowledge().then(setFiles).catch(() => setFiles([]))
     void refreshSessions()
+    void window.lens
+      .settings()
+      .then((s) => { if (s && typeof s.ollamaUrl === 'string') setOllamaUrl(s.ollamaUrl) })
+      .catch(() => {})
 
     const offs = [
       window.lens.onStatus(setStatus),
@@ -296,7 +302,7 @@ export default function App() {
                 Ask anything. Add your own documents and it answers as you, not as a
                 stranger. Press{' '}
                 <kbd className="rounded border border-line bg-raise px-1 font-[family-name:var(--font-read)] text-[10px] text-paper">
-                  &#8984;&#8679;Space
+                  {formatAccelerator(status?.askShortcut || 'CommandOrControl+Shift+Space', detectPlatform())}
                 </kbd>{' '}
                 to ask about what is on your screen.
               </p>
@@ -408,6 +414,13 @@ export default function App() {
           }}
           onOpenKnowledge={() => void window.lens.openKnowledgeFolder()}
           onSaveAboutMe={(text) => void window.lens.addAboutMe(text)}
+          ollamaUrl={ollamaUrl}
+          onSaveOllamaUrl={async (url) => {
+            setOllamaUrl(url)
+            await window.lens.setOllamaUrl(url)
+            // The new server has its own models, so refresh the picker.
+            setModels(await window.lens.listModels().catch(() => []))
+          }}
         />
       )}
     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { StatusInfo } from '../lens.js'
+import { Shortcuts } from './Shortcuts.js'
 
 /** A destructive action always names what it removes and cannot fire on one click. */
 function DangerButton({ label, confirmLabel, onConfirm }: {
@@ -32,6 +33,8 @@ function DangerButton({ label, confirmLabel, onConfirm }: {
 
 interface Props {
   status: StatusInfo | null
+  ollamaUrl: string
+  onSaveOllamaUrl(url: string): void
   files: string[]
   onClose(): void
   onClearMemory(): void
@@ -43,11 +46,13 @@ interface Props {
 }
 
 export function SettingsPanel({
-  status, files, onClose, onClearMemory, onClearHistory, onClearKnowledge, onRemoveFile,
-  onOpenKnowledge, onSaveAboutMe,
+  status, files, ollamaUrl, onSaveOllamaUrl, onClose, onClearMemory, onClearHistory,
+  onClearKnowledge, onRemoveFile, onOpenKnowledge, onSaveAboutMe,
 }: Props) {
   const [aboutMe, setAboutMe] = useState('')
   const [saved, setSaved] = useState(false)
+  const [url, setUrl] = useState(ollamaUrl)
+  const [urlSaved, setUrlSaved] = useState(false)
 
   useEffect(() => {
     void window.lens.getAboutMe().then(setAboutMe).catch(() => setAboutMe(''))
@@ -83,6 +88,35 @@ export function SettingsPanel({
                 ? 'Your own machine. Nothing is sent to a company.'
                 : 'A cloud provider, using your API key.'}
             </p>
+          </div>
+        </section>
+
+        <Shortcuts askAccelerator={status?.askShortcut} />
+
+        <section>
+          <h3 className="readout mb-1.5 text-muted/70">Model server</h3>
+          <p className="mb-2 text-[11px] leading-relaxed text-muted">
+            Where Ollama runs. Point this at another computer to use its graphics card
+            while Lens stays on this one.
+          </p>
+          <div className="flex gap-1.5">
+            <input
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="http://localhost:11434"
+              spellCheck={false}
+              className="min-w-0 flex-1 rounded-lg border border-line bg-raise px-2.5 py-1.5 font-[family-name:var(--font-read)] text-[11px] text-paper outline-none placeholder:text-muted/50 focus:border-brass/40"
+            />
+            <button
+              onClick={() => {
+                onSaveOllamaUrl(url.trim())
+                setUrlSaved(true)
+                setTimeout(() => setUrlSaved(false), 1800)
+              }}
+              className="shrink-0 rounded-lg bg-raise px-2.5 py-1.5 text-[11.5px] text-paper hover:bg-white/10"
+            >
+              {urlSaved ? 'Saved' : 'Save'}
+            </button>
           </div>
         </section>
 
