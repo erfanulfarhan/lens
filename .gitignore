@@ -11,14 +11,16 @@ dist/
 !.env.example
 
 # The user's own documents and learned memory never belong in the repo.
-knowledge/
-models/
+# Leading slash matters: a bare "knowledge/" also matched electron/knowledge/,
+# the app's source, and silently kept 11 files out of the published repository.
+/knowledge/
+/models/
 
 # Generated icon intermediates; build/icon.svg is the source of truth.
 build/icons.iconset/
 
 # Compiled Swift helper: rebuilt with `npm run native`.
-bin/
+/bin/
 native/*/.build/
 
 .DS_Store
