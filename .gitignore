@@ -1,0 +1,24 @@
+# Dependencies and build output
+node_modules/
+out/
+dist/
+*.tsbuildinfo
+
+# Secrets: every env variant, not just .env — a ".env.gemini" backup nearly
+# shipped two live API keys.
+.env
+.env.*
+!.env.example
+
+# The user's own documents and learned memory never belong in the repo.
+knowledge/
+models/
+
+# Generated icon intermediates; build/icon.svg is the source of truth.
+build/icons.iconset/
+
+# Compiled Swift helper: rebuilt with `npm run native`.
+bin/
+native/*/.build/
+
+.DS_Store

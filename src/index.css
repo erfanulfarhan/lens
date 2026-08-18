@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/*
+ * Lens is an instrument you own, not a rented service. The palette is brass and
+ * sage on graphite: equipment, not glass. Fonts are system stacks on purpose —
+ * an offline-first app must not fetch webfonts — so personality comes from the
+ * type treatment instead: wide-tracked uppercase mono micro-labels.
+ */
+@theme {
+  --color-ink: #14161c;
+  --color-panel: #1c1f27;
+  --color-raise: #23272f;
+  --color-line: #2a2f3a;
+  --color-brass: #c8964f;
+  --color-brass-dim: #8a6836;
+  --color-sage: #7fa88b;
+  --color-paper: #e8e6e1;
+  --color-muted: #8c8f98;
+
+  --font-ui: ui-sans-serif, -apple-system, "SF Pro Text", "Segoe UI Variable", system-ui, sans-serif;
+  --font-read: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, monospace;
+}
+
+html, body, #root { height: 100%; margin: 0; background: transparent; }
+body {
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-paper);
+}
+
+.drag { -webkit-app-region: drag; }
+.no-drag { -webkit-app-region: no-drag; }
+
+/* The recurring instrument label: small, uppercase, widely tracked, mono. */
+.readout {
+  font-family: var(--font-read);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Quiet scrollbars: the content matters, the chrome does not. */
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: #333844; border-radius: 4px; }
+*::-webkit-scrollbar-thumb:hover { background: #3d4350; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* Focus is always visible, on brass so it reads as deliberate. */
+:focus-visible { outline: 1.5px solid var(--color-brass); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Level-meter pulse for the thinking indicator. */
+@keyframes lens-bar {
+  0%, 100% { height: 5px; opacity: 0.45; }
+  50%      { height: 13px; opacity: 1; }
+}
+
+/* Each rotated thinking word fades in rather than snapping. */
+@keyframes lens-fade {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Caret that trails streaming text, so output looks live rather than pasted. */
+@keyframes lens-caret {
+  0%, 45%  { opacity: 1; }
+  55%, 100% { opacity: 0; }
+}
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--color-brass);
+  animation: lens-caret 1s step-end infinite;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No pulsing; hold a steady mid state so the indicator still reads as active. */
+  [style*="lens-bar"] { animation: none !important; height: 9px !important; opacity: 0.8 !important; }
+  .caret::after { animation: none !important; opacity: 1; }
+  [style*="lens-fade"] { animation: none !important; }
+}
+
+/*
+ * The mark animates only while the model is working: blades turn, opening
+ * dilates. Two different durations so it never looks like a single spinner.
+ */
+@keyframes lens-blades-turn {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(60deg); } /* one blade pitch: the cycle is seamless */
+}
+@keyframes lens-iris-dilate {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(0.72); }
+}
+
+.lens-mark-active .lens-blades {
+  animation: lens-blades-turn 3.2s linear infinite;
+}
+.lens-mark-active .lens-iris {
+  animation: lens-iris-dilate 1.9s ease-in-out infinite;
+}
+
+/* A gentle idle breath on hover, so the mark feels alive without nagging. */
+.lens-mark-idle:hover .lens-iris {
+  transform: scale(0.9);
+  transition: transform 240ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lens-mark-active .lens-blades,
+  .lens-mark-active .lens-iris { animation: none !important; }
+  /* Hold a part-closed iris so "working" is still visually distinct. */
+  .lens-mark-active .lens-iris { transform: scale(0.8); }
+}

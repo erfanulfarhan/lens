@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key><string>dev.lens.audio</string>
+  <key>CFBundleName</key><string>lens-audio</string>
+  <key>CFBundleExecutable</key><string>lens-audio</string>
+  <key>CFBundleShortVersionString</key><string>0.1.0</string>
+  <!-- macOS aborts the process (SIGABRT) if a binary asks for these without
+       declaring why. These strings are what the user sees in the prompt. -->
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>Lens transcribes speech on your device so it can follow the conversation. Audio never leaves your machine.</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Lens listens to your microphone so it can tell your voice apart from other people on the call.</string>
+  <key>NSAudioCaptureUsageDescription</key>
+  <string>Lens listens to audio playing on this Mac so it can follow what others say on a call.</string>
+</dict>
+</plist>

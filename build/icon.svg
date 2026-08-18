@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Brass lit from upper left, like a machined barrel. -->
+    <linearGradient id="brass" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#EBC689"/>
+      <stop offset="0.42" stop-color="#C8964F"/>
+      <stop offset="1" stop-color="#7E5E30"/>
+    </linearGradient>
+    <linearGradient id="tile" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#20242C"/>
+      <stop offset="1" stop-color="#11131A"/>
+    </linearGradient>
+    <!-- The opening glows sage: light arriving from your own machine. -->
+    <radialGradient id="aperture" cx="0.42" cy="0.38" r="0.8">
+      <stop offset="0" stop-color="#9FC4AB"/>
+      <stop offset="0.6" stop-color="#5F8A6D"/>
+      <stop offset="1" stop-color="#24382C"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="114" fill="url(#tile)"/>
+  <rect x="1.5" y="1.5" width="509" height="509" rx="112.5" fill="none" stroke="#2A2F3A" stroke-width="3"/>
+
+  <!-- Aperture: an instrument you open and close, not an eye that watches you. -->
+  <polygon points="256.0 138.0 358.2 197.0 358.2 315.0 256.0 374.0 153.8 315.0 153.8 197.0" fill="url(#aperture)"/>
+  <circle cx="256" cy="256" r="170" fill="none"
+          stroke="url(#brass)" stroke-width="64"/>
+
+  <!-- Blade seams, cut in the tile colour so the ring reads as six plates. -->
+  <g stroke="#14161C" stroke-width="9" stroke-linecap="round" stroke-opacity="0.9">
+    <line x1="256.0" y1="142.0" x2="256.0" y2="46.0" />
+    <line x1="354.7" y1="199.0" x2="437.9" y2="151.0" />
+    <line x1="354.7" y1="313.0" x2="437.9" y2="361.0" />
+    <line x1="256.0" y1="370.0" x2="256.0" y2="466.0" />
+    <line x1="157.3" y1="313.0" x2="74.1" y2="361.0" />
+    <line x1="157.3" y1="199.0" x2="74.1" y2="151.0" />
+  </g>
+
+  <!-- Inner lip catches the light; keeps the opening from looking pasted on. -->
+  <polygon points="256.0 138.0 358.2 197.0 358.2 315.0 256.0 374.0 153.8 315.0 153.8 197.0" fill="none" stroke="#F0D5A4" stroke-width="4" stroke-opacity="0.35"/>
+</svg>

@@ -1,0 +1,135 @@
+{
+  "name": "lens",
+  "version": "0.1.0",
+  "description": "A screen and audio aware AI assistant that runs on your own machine.",
+  "main": "out/main/main.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "dist": "npm run build && electron-builder --mac --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win",
+    "native": "cd native/lens-audio && swift build -c release && cp .build/release/lens-audio ../../bin/"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "png-to-ico": "^3.0.2",
+    "sharp": "^0.35.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.7.2",
+    "vite": "^7.0.0",
+    "vitest": "^4.1.10"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.117.1",
+    "mammoth": "^1.12.1",
+    "pdf-parse": "^2.4.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "author": {
+    "name": "Erfanul Hakim Farhan"
+  },
+  "license": "MIT",
+  "build": {
+    "appId": "dev.lens.app",
+    "productName": "Lens",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "out/**/*",
+      "build/icon.*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "bin",
+        "to": "bin",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "build/icon.png",
+        "to": "build/icon.png"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Lens listens to your microphone so it can tell your voice apart from other people on a call.",
+        "NSSpeechRecognitionUsageDescription": "Lens transcribes speech on your device so it can follow the conversation. Audio never leaves your machine.",
+        "NSAudioCaptureUsageDescription": "Lens listens to audio playing on this Mac so it can follow what others say on a call.",
+        "NSCameraUsageDescription": "Not used by Lens.",
+        "LSUIElement": false
+      }
+    },
+    "dmg": {
+      "title": "Lens ${version}",
+      "contents": [
+        {
+          "x": 140,
+          "y": 200,
+          "type": "file"
+        },
+        {
+          "x": 400,
+          "y": 200,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Lens"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    }
+  }
+}
