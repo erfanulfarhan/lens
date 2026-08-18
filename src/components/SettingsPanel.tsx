@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { StatusInfo } from '../lens.js'
 import { Shortcuts } from './Shortcuts.js'
+import { Providers } from './Providers.js'
 
 /** A destructive action always names what it removes and cannot fire on one click. */
 function DangerButton({ label, confirmLabel, onConfirm }: {
@@ -34,7 +35,10 @@ function DangerButton({ label, confirmLabel, onConfirm }: {
 interface Props {
   status: StatusInfo | null
   ollamaUrl: string
+  hasKey: Record<string, boolean>
   onSaveOllamaUrl(url: string): void
+  onSetKey(id: string, key: string): Promise<void>
+  onSetProvider(id: string): Promise<void>
   files: string[]
   onClose(): void
   onClearMemory(): void
@@ -46,8 +50,9 @@ interface Props {
 }
 
 export function SettingsPanel({
-  status, files, ollamaUrl, onSaveOllamaUrl, onClose, onClearMemory, onClearHistory,
-  onClearKnowledge, onRemoveFile, onOpenKnowledge, onSaveAboutMe,
+  status, files, ollamaUrl, hasKey, onSaveOllamaUrl, onSetKey, onSetProvider, onClose,
+  onClearMemory, onClearHistory, onClearKnowledge, onRemoveFile, onOpenKnowledge,
+  onSaveAboutMe,
 }: Props) {
   const [aboutMe, setAboutMe] = useState('')
   const [saved, setSaved] = useState(false)
@@ -77,6 +82,14 @@ export function SettingsPanel({
       </header>
 
       <div className="flex-1 space-y-5 overflow-y-auto px-3 py-3">
+        <Providers
+          activeProvider={status?.providerId ?? 'ollama'}
+          hasKey={hasKey}
+          onSetKey={onSetKey}
+          onSetProvider={onSetProvider}
+          onOpenExternal={(url) => void window.lens.openExternal(url)}
+        />
+
         <section>
           <h3 className="readout mb-1.5 text-muted/70">Running on</h3>
           <div className="rounded-lg border border-line bg-panel p-2.5">

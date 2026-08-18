@@ -707,8 +707,14 @@ app.whenReady().then(async () => {
   ipcMain.handle('lens:set-api-key', async (_e, id: ProviderId, key: string) => {
     if (!settings) return false
     await settings.setApiKey(id, key)
-    // Switching to a provider the moment its key arrives is what the user means.
-    if (key) await settings.update({ provider: id })
+    if (key) {
+      // Switching to a provider the moment its key arrives is what the user means.
+      await settings.update({ provider: id })
+    } else if (settings.raw.provider === id) {
+      // Removing the key of the provider in use would leave it selected but
+      // unusable, so fall back to local hosting, which needs no key.
+      await settings.update({ provider: 'ollama' })
+    }
     provider = buildProvider()
     currentModel = (provider as { model?: string }).model ?? provider.name
     modelCache.clear()

@@ -74,3 +74,19 @@ describe('SettingsStore', () => {
     expect(b.redacted().models.gemini).toBe('gemini-3.7-flash')
   })
 })
+
+describe('redacted output shape', () => {
+  // The interface reads `hasKey` to decide what to show; the keys themselves must
+  // never cross that boundary.
+  it('reports which providers have a key without exposing any', async () => {
+    const s = store()
+    await s.load()
+    await s.setApiKey('anthropic', 'sk-ant-secret-value')
+    await s.setApiKey('groq', 'gsk_another_secret')
+
+    const r = s.redacted()
+    expect(r.hasKey).toEqual({ anthropic: true, groq: true })
+    expect(JSON.stringify(r)).not.toContain('secret')
+    expect(r.ollamaUrl).toBe('http://localhost:11434')
+  })
+})

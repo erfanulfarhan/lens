@@ -33,11 +33,20 @@ export default function App() {
   const [noKnowledge, setNoKnowledge] = useState(false)
   const [loadingModel, setLoadingModel] = useState<string | null>(null)
   const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434')
+  const [hasKey, setHasKey] = useState<Record<string, boolean>>({})
   const [input, setInput] = useState('')
   const [screenAttached, setScreenAttached] = useState(false)
   const [lines, setLines] = useState<TranscriptLine[]>([])
   const scroller = useRef<HTMLDivElement>(null)
   const nextId = useRef(0)
+
+  // Settings never return the keys themselves, only which providers have one.
+  const refreshSettings = useCallback(async () => {
+    const s = await window.lens.settings().catch(() => null)
+    if (!s) return
+    if (typeof s.ollamaUrl === 'string') setOllamaUrl(s.ollamaUrl)
+    setHasKey((s.hasKey as Record<string, boolean>) ?? {})
+  }, [])
 
   const refreshSessions = useCallback(async () => {
     setSessions(await window.lens.sessions().catch(() => []))
@@ -48,10 +57,7 @@ export default function App() {
     void window.lens.listModels().then(setModels).catch(() => setModels([]))
     void window.lens.listKnowledge().then(setFiles).catch(() => setFiles([]))
     void refreshSessions()
-    void window.lens
-      .settings()
-      .then((s) => { if (s && typeof s.ollamaUrl === 'string') setOllamaUrl(s.ollamaUrl) })
-      .catch(() => {})
+    void refreshSettings()
 
     const offs = [
       window.lens.onStatus(setStatus),
@@ -110,7 +116,7 @@ export default function App() {
       }),
     ]
     return () => offs.forEach((off) => off())
-  }, [refreshSessions])
+  }, [refreshSessions, refreshSettings])
 
   useEffect(() => {
     scroller.current?.scrollTo({ top: scroller.current.scrollHeight, behavior: 'smooth' })
@@ -415,6 +421,19 @@ export default function App() {
           onOpenKnowledge={() => void window.lens.openKnowledgeFolder()}
           onSaveAboutMe={(text) => void window.lens.addAboutMe(text)}
           ollamaUrl={ollamaUrl}
+          hasKey={hasKey}
+          onSetKey={async (id, key) => {
+            await window.lens.setApiKey(id, key)
+            await refreshSettings()
+            void window.lens.requestStatus()
+            setModels(await window.lens.listModels().catch(() => []))
+          }}
+          onSetProvider={async (id) => {
+            await window.lens.setProvider(id)
+            await refreshSettings()
+            void window.lens.requestStatus()
+            setModels(await window.lens.listModels().catch(() => []))
+          }}
           onSaveOllamaUrl={async (url) => {
             setOllamaUrl(url)
             await window.lens.setOllamaUrl(url)
