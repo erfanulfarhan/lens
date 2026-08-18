@@ -11,4 +11,4 @@ It will also run the model on a different computer on your network. My laptop st
 Free, open source, installers for Mac and Windows:
 https://github.com/erfanulfarhan/lens
 
-If you try it, tell me what breaks.
+If it saves you a subscription, that was the point.
