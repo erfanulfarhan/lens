@@ -30,6 +30,7 @@ export default function App() {
   const [settings, setSettings] = useState(false)
   const [onboarding, setOnboarding] = useState(() => localStorage.getItem('lens-onboarded') !== 'yes')
   const [noKnowledge, setNoKnowledge] = useState(false)
+  const [loadingModel, setLoadingModel] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [screenAttached, setScreenAttached] = useState(false)
   const [lines, setLines] = useState<TranscriptLine[]>([])
@@ -198,7 +199,14 @@ export default function App() {
 
           <select
             value={status?.model ?? ''}
-            onChange={(e) => void window.lens.setModel(e.target.value)}
+            onChange={async (e) => {
+              const next = e.target.value
+              // A 12GB card holds one model at a time, so a switch means loading
+              // several GB from disk. Show that rather than appearing frozen.
+              setLoadingModel(next)
+              await window.lens.setModel(next)
+              setLoadingModel(null)
+            }}
             title="Model"
             className="no-drag ml-1 min-w-0 flex-1 truncate rounded-md border border-line bg-raise px-1.5 py-1 font-[family-name:var(--font-read)] text-[10.5px] text-muted outline-none hover:text-paper focus:border-brass/40"
           >
@@ -240,12 +248,26 @@ export default function App() {
           </button>
           <button
             onClick={() => void window.lens.hide()}
-            title="Hide (Esc)"
+            title="Hide (Esc). Lens keeps running."
             className="no-drag shrink-0 rounded-md px-1.5 py-1 text-[13px] leading-none text-muted transition hover:bg-raise hover:text-paper"
           >
             <span aria-hidden>&#8211;</span>
           </button>
+          <button
+            onClick={() => void window.lens.quit()}
+            title="Quit Lens"
+            className="no-drag shrink-0 rounded-md px-1.5 py-1 text-[13px] leading-none text-muted transition hover:bg-red-500/20 hover:text-red-300"
+          >
+            <span aria-hidden>&times;</span>
+          </button>
         </header>
+
+        {loadingModel && (
+          <p className="border-b border-brass/20 bg-brass/10 px-3 py-2 text-[11px] leading-relaxed text-brass">
+            Loading {loadingModel} into your GPU. First use takes about 15 seconds, then
+            answers are fast.
+          </p>
+        )}
 
         {status?.listening && (
           <Transcript

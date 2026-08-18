@@ -79,7 +79,7 @@
         }
       ],
       "darkModeSupport": true,
-      "hardenedRuntime": true,
+      "hardenedRuntime": false,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist",
       "extendInfo": {
@@ -88,7 +88,10 @@
         "NSAudioCaptureUsageDescription": "Lens listens to audio playing on this Mac so it can follow what others say on a call.",
         "NSCameraUsageDescription": "Not used by Lens.",
         "LSUIElement": false
-      }
+      },
+      "identity": null,
+      "type": "distribution",
+      "gatekeeperAssess": false
     },
     "dmg": {
       "title": "Lens ${version}",
@@ -130,6 +133,7 @@
         "AppImage"
       ],
       "category": "Utility"
-    }
+    },
+    "afterPack": "build/afterPack.cjs"
   }
 }
