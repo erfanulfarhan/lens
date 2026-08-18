@@ -1,9 +1,10 @@
-I built an AI assistant that runs entirely on my own computer.
+Every AI assistant that can read your screen wants a monthly fee and a copy of everything it sees.
 
-It sees your screen, follows your calls, and answers from your own documents. No
-subscription, and nothing leaves your machine, because the model runs locally.
+I built one that wants neither.
 
-It even checks your hardware and picks a model that will run smoothly on it.
+Lens looks at your screen, follows your calls, and answers from your own documents, with the model running on your own computer. No subscription. Nothing uploaded.
 
-Open source, with installers for macOS and Windows:
+It even checks your hardware and picks a model that will actually run on it.
+
+Free and open source, for Mac and Windows:
 https://github.com/erfanulfarhan/lens
