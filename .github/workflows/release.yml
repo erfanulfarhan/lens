@@ -1,0 +1,69 @@
+name: Release
+
+# Tag a version to publish installers:  git tag v0.2.0 && git push origin v0.2.0
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS runners are arm64, which is also where the Swift helper builds.
+          - os: macos-latest
+            platform: mac
+          - os: windows-latest
+            platform: win
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build the audio helper
+        if: matrix.platform == 'mac'
+        # macOS only: it uses ScreenCaptureKit and on-device speech recognition.
+        run: npm run native
+
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Build installer
+        # Unsigned for now. Set CSC_LINK/CSC_KEY_PASSWORD (macOS) or
+        # WIN_CSC_LINK/WIN_CSC_KEY_PASSWORD (Windows) as repository secrets to sign.
+        run: npx electron-builder --${{ matrix.platform }} --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lens-${{ matrix.platform }}
+          path: |
+            dist/*.dmg
+            dist/*.exe
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Attach installers to the release
+        run: gh release upload "${GITHUB_REF_NAME}" $(find artifacts -type f \( -name '*.dmg' -o -name '*.exe' \)) --clobber --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
