@@ -8,13 +8,13 @@ on, and answers using documents you give it. The model can run locally through
 computer. If you already own an API key, it uses that instead.
 
 <p align="center">
-  <img src="docs/social/lens-wide.png" width="900" alt="Lens answering a question, with the chat history sidebar open"/>
+  <img src="docs/screenshots/03-history.png" width="900" alt="Lens answering a question, with the chat history sidebar open"/>
 </p>
 
 <p align="center">
-  <img src="docs/social/lens-square.png" width="440" alt="Settings: choose a provider, add an API key, view shortcuts"/>
+  <img src="docs/screenshots/04-settings.png" width="380" alt="Settings: choose a provider, add an API key, view shortcuts"/>
   &nbsp;
-  <img src="docs/social/lens-portrait.png" width="352" alt="The Lens panel, ready for a question"/>
+  <img src="docs/screenshots/02-answer.png" width="470" alt="The Lens panel, ready for a question"/>
 </p>
 
 ## Why
