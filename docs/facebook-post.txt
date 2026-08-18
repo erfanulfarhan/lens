@@ -1,0 +1,28 @@
+I built my own AI assistant, and it runs entirely on my computer.
+
+Most AI assistants that can see your screen cost a monthly subscription, and every
+screenshot goes to a company's servers. I wanted to know whether I could build the
+same thing the other way round: your machine, your model, your data.
+
+So I built Lens.
+
+It sees your screen when you ask it to, listens to your calls and transcribes them
+on the device, and answers using your own documents. The model runs locally, so
+there is no subscription and nothing leaves your computer. If you already own an
+API key it works with that too.
+
+A few things I am proud of:
+
+- It reads your RAM and graphics card and recommends a model that will actually run
+  smoothly, instead of leaving you to guess between a dozen names
+- You can host the model on a different computer on your network, so a laptop stays
+  cool and quiet while a desktop does the heavy lifting
+- It reads your PDFs and notes and pulls only the relevant parts into each answer,
+  so a large library still works on a small model
+- The whole thing is open source
+
+Free, private, and yours. Installers for macOS and Windows are on GitHub:
+
+https://github.com/erfanulfarhan/lens
+
+Would genuinely love feedback if you try it.

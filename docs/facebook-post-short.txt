@@ -1,0 +1,9 @@
+I built an AI assistant that runs entirely on my own computer.
+
+It sees your screen, follows your calls, and answers from your own documents. No
+subscription, and nothing leaves your machine, because the model runs locally.
+
+It even checks your hardware and picks a model that will run smoothly on it.
+
+Open source, with installers for macOS and Windows:
+https://github.com/erfanulfarhan/lens
