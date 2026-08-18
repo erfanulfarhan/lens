@@ -1,0 +1,14 @@
+Every AI assistant that can read your screen wants two things: a monthly fee, and a copy of everything it sees.
+
+I spent this week building one that wants neither.
+
+It's called Lens. It looks at your screen when you ask it to, listens to your calls and writes them down on the device, and answers using your own documents. The model runs on your computer, so there is no subscription and nothing gets uploaded anywhere.
+
+The part I am most pleased with is small. It reads your RAM and your graphics card, tells you which model will actually run well on your machine, and downloads it for you. No guessing between a dozen names you have never heard of.
+
+It will also run the model on a different computer on your network. My laptop stays cool and quiet while my desktop does the work.
+
+Free, open source, installers for Mac and Windows:
+https://github.com/erfanulfarhan/lens
+
+If it saves you a subscription, that was the point.
