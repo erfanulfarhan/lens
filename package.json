@@ -12,7 +12,7 @@
     "dist": "npm run build && electron-builder --mac --win",
     "dist:mac": "npm run build && electron-builder --mac",
     "dist:win": "npm run build && electron-builder --win",
-    "native": "cd native/lens-audio && swift build -c release && cp .build/release/lens-audio ../../bin/"
+    "native": "mkdir -p bin && cd native/lens-audio && swift build -c release && cp .build/release/lens-audio ../../bin/"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
