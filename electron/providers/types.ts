@@ -39,6 +39,8 @@ export interface AskResult {
     cacheReadTokens: number
     cacheWriteTokens: number
   }
+  /** How long the model reasoned before answering, when it reasons at all. */
+  thinking?: { ms: number; tokens: number }
   /** Provider that actually served the request, for the debug HUD. */
   servedBy: string
 }
@@ -66,7 +68,7 @@ export interface Provider {
     ctx: AskContext,
     onDelta: (text: string) => void,
     signal: AbortSignal,
-    /** Called repeatedly while a reasoning model is thinking, before the answer. */
-    onThinking?: () => void
+    /** Called while a reasoning model thinks, with tokens spent so far. */
+    onThinking?: (tokens: number) => void
   ): Promise<AskResult>
 }

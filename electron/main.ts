@@ -237,7 +237,7 @@ async function ask(source: TriggerSource, question: string): Promise<void> {
       ctx,
       (delta) => send('lens:delta', delta),
       controller.signal,
-      () => send('lens:thinking')
+      (tokens) => send('lens:thinking', tokens)
     )
     history.push({ role: 'user', text: question }, { role: 'assistant', text: result.text })
     void memory?.add(question, result.text).catch(() => {})
@@ -255,6 +255,7 @@ async function ask(source: TriggerSource, question: string): Promise<void> {
 
     send('lens:done', {
       servedBy: result.servedBy,
+      thinking: result.thinking,
       // A zero here across repeated calls is the only reliable signal that
       // prompt caching has silently stopped working.
       cacheReadTokens: result.usage.cacheReadTokens,

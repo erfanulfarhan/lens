@@ -83,7 +83,7 @@ contextBridge.exposeInMainWorld('lens', {
   setModel: (model: string) => ipcRenderer.invoke('lens:set-model', model),
   onStart: on<{ source: string; question: string }>('lens:start'),
   onDelta: on<string>('lens:delta'),
-  onThinking: on<void>('lens:thinking'),
+  onThinking: on<number>('lens:thinking'),
   onNoKnowledge: on<void>('lens:no-knowledge'),
   onSessions: on<SessionMeta[]>('lens:sessions'),
   onScreenAttached: on<void>('lens:screen-attached'),
@@ -97,6 +97,7 @@ contextBridge.exposeInMainWorld('lens', {
     cacheReadTokens: number
     outputTokens: number
     sawScreen: boolean
+    thinking?: { ms: number; tokens: number }
   }>('lens:done'),
   onError: on<string>('lens:error'),
   onSuppressed: on<{ source: string; reason: string }>('lens:suppressed'),

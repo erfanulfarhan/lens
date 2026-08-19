@@ -3,6 +3,8 @@ export interface DoneInfo {
   cacheReadTokens: number
   outputTokens: number
   sawScreen: boolean
+  /** Present only when the model reasoned before answering. */
+  thinking?: { ms: number; tokens: number }
 }
 
 export interface UpdateInfo {
@@ -128,7 +130,7 @@ declare global {
       setModel(model: string): Promise<string>
       onStart(cb: (p: { source: string; question: string }) => void): () => void
       onDelta(cb: (text: string) => void): () => void
-      onThinking(cb: () => void): () => void
+      onThinking(cb: (tokens: number) => void): () => void
       onNoKnowledge(cb: () => void): () => void
       onSessions(cb: (list: SessionMeta[]) => void): () => void
       onScreenAttached(cb: () => void): () => void

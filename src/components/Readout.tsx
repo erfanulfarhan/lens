@@ -6,10 +6,25 @@ import type { DoneInfo } from '../lens.js'
  * own knowledge it drew on — the facts that matter when you host the model
  * yourself, and the ones a cloud product cannot honestly show you.
  */
+/** Seconds with one decimal below ten, whole seconds above, minutes beyond that. */
+function formatDuration(ms: number): string {
+  const s = ms / 1000
+  if (s < 10) return `${s.toFixed(1)}s`
+  if (s < 60) return `${Math.round(s)}s`
+  return `${Math.floor(s / 60)}m ${Math.round(s % 60)}s`
+}
+
 export function Readout({ info, docs }: { info: DoneInfo; docs: number }) {
   const local = info.servedBy.startsWith('ollama:')
 
   const cells = [
+    // The reasoning cost leads, because it is the part of the wait the user felt.
+    ...(info.thinking
+      ? [{ label: `thought for ${formatDuration(info.thinking.ms)}`, accent: false }]
+      : []),
+    ...(info.thinking && info.thinking.tokens > 0
+      ? [{ label: `${info.thinking.tokens} thinking tokens`, accent: false }]
+      : []),
     { label: local ? 'local' : 'cloud', accent: local },
     { label: info.sawScreen ? 'saw screen' : 'no screen' },
     ...(docs > 0 ? [{ label: `${docs} docs` }] : []),

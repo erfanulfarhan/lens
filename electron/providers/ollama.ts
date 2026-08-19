@@ -72,7 +72,7 @@ export class OllamaProvider implements Provider {
     ctx: AskContext,
     onDelta: (text: string) => void,
     signal: AbortSignal,
-    onThinking?: () => void
+    onThinking?: (tokens: number) => void
   ): Promise<AskResult> {
     const system = ctx.system.map((b) => b.text).join('\n\n')
 
@@ -107,7 +107,16 @@ export class OllamaProvider implements Provider {
     return {
       text: answer,
       stopReason: 'stop',
-      usage: { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 },
+      usage: {
+        inputTokens: 0,
+        // ~4 characters per token is the working estimate used throughout Lens.
+        outputTokens: Math.round(answer.length / 4),
+        cacheReadTokens: 0,
+        cacheWriteTokens: 0,
+      },
+      thinking: this.lastThinking
+        ? { ms: this.lastThinking.ms, tokens: Math.round(this.lastThinking.chars / 4) }
+        : undefined,
       servedBy: this.name,
     }
   }
@@ -118,7 +127,7 @@ export class OllamaProvider implements Provider {
     onDelta: (text: string) => void,
     signal: AbortSignal,
     numPredict?: number,
-    onThinking?: () => void,
+    onThinking?: (tokens: number) => void,
     forceThink?: boolean
   ): Promise<string> {
     const think = forceThink ?? this.wantsThink(model)
@@ -167,6 +176,16 @@ export class OllamaProvider implements Provider {
     }
 
     let full = ''
+    // Measured rather than estimated: the reasoning phase is the wait the user
+    // actually experiences, so the number shown afterwards should be real.
+    let thinkingChars = 0
+    let sawThinking = false
+    // Measured from the request going out to the first word appearing, because
+    // that is the wait the user actually sits through. Timing only the reasoning
+    // chunks reported ten seconds after an eighty-four second wait, which is
+    // technically true and completely useless.
+    const requestStartedAt = Date.now()
+    let firstContentAt = 0
     const reader = res.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
@@ -187,9 +206,14 @@ export class OllamaProvider implements Provider {
         }
         // A reasoning model streams `thinking` before `content`. Surface a
         // progress signal during reasoning, but only stream the real answer.
-        if (chunk.message?.thinking && !chunk.message.content) onThinking?.()
+        if (chunk.message?.thinking && !chunk.message.content) {
+          thinkingChars += chunk.message.thinking.length
+          sawThinking = true
+          onThinking?.(Math.round(thinkingChars / 4))
+        }
         const piece = chunk.message?.content
         if (piece) {
+          if (!firstContentAt) firstContentAt = Date.now()
           full += piece
           onDelta(piece)
         }
@@ -212,6 +236,15 @@ export class OllamaProvider implements Provider {
       }
     }
 
+    // Only reported for a model that actually reasoned; a fast model that simply
+    // took a moment to warm up should not be described as thinking.
+    this.lastThinking = sawThinking
+      ? { ms: (firstContentAt || Date.now()) - requestStartedAt, chars: thinkingChars }
+      : null
+
     return full
   }
+
+  /** Reasoning cost of the most recent answer, or null if it did not reason. */
+  lastThinking: { ms: number; chars: number } | null = null
 }

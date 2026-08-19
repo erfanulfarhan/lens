@@ -27,6 +27,7 @@ export default function App() {
   const [turns, setTurns] = useState<Turn[]>([])
   const [streaming, setStreaming] = useState(false)
   const [reasoning, setReasoning] = useState(false)
+  const [thinkTokens, setThinkTokens] = useState(0)
   const [status, setStatus] = useState<StatusInfo | null>(null)
   const [models, setModels] = useState<string[]>([])
   const [files, setFiles] = useState<string[]>([])
@@ -80,12 +81,16 @@ export default function App() {
         setTurns((prev) => [...prev, { id: nextId.current++, role: 'assistant', text: m, error: true }])
       ),
       window.lens.onNoKnowledge(() => setNoKnowledge(true)),
-      window.lens.onThinking(() => setReasoning(true)),
+      window.lens.onThinking((tokens) => {
+        setReasoning(true)
+        setThinkTokens(tokens)
+      }),
 
       window.lens.onStart(({ question }) => {
         setStreaming(true)
         setScreenAttached(false)
         setReasoning(false)
+        setThinkTokens(0)
         setNoKnowledge(false)
         setTurns((prev) => [
           ...prev,
@@ -401,7 +406,7 @@ export default function App() {
                     />
                   )
                 ) : (
-                  <Thinking reasoning={reasoning} />
+                  <Thinking reasoning={reasoning} tokens={thinkTokens} />
                 )}
                 {t.done && (
                   <div className="group flex items-center gap-2">

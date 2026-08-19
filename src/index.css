@@ -138,3 +138,18 @@ body {
   /* Hold a part-closed iris so "working" is still visually distinct. */
   .lens-mark-active .lens-iris { transform: scale(0.8); }
 }
+
+/* Caret that follows the typed thinking word. */
+.type-caret {
+  display: inline-block;
+  width: 2px;
+  height: 0.95em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--color-brass);
+  animation: lens-caret 0.9s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .type-caret { animation: none !important; opacity: 1; }
+}
