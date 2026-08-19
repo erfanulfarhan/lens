@@ -3,6 +3,65 @@ import type { StatusInfo } from '../lens.js'
 import { Shortcuts } from './Shortcuts.js'
 import { Providers } from './Providers.js'
 
+/**
+ * Shows the running version and lets the user check on demand. The automatic
+ * check happens shortly after launch; this is for when someone wants to know now.
+ */
+function UpdateRow() {
+  const [info, setInfo] = useState<import('../lens.js').UpdateInfo | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    void window.lens.updateStatus().then(setInfo).catch(() => {})
+    return window.lens.onUpdate(setInfo)
+  }, [])
+
+  const label = () => {
+    if (busy || info?.state === 'checking') return 'Checking…'
+    if (info?.state === 'available') return `Update to ${info.release?.version}`
+    if (info?.state === 'error') return 'Check again'
+    return 'Check for updates'
+  }
+
+  return (
+    <div className="rounded-lg border border-line bg-panel p-2.5">
+      <p className="font-[family-name:var(--font-read)] text-[11px] text-paper">
+        Lens {info?.currentVersion ?? ''}
+      </p>
+      <p className="mt-0.5 text-[11px] text-muted">
+        {info?.state === 'available'
+          ? `Version ${info.release?.version} is available.`
+          : info?.state === 'error'
+            ? 'Could not reach GitHub. You may be offline.'
+            : info?.state === 'current'
+              ? 'This is the latest version.'
+              : 'Checks automatically shortly after launch.'}
+      </p>
+
+      <div className="mt-2 flex gap-1.5">
+        <button
+          onClick={async () => {
+            setBusy(true)
+            try { setInfo(await window.lens.checkUpdate()) } finally { setBusy(false) }
+          }}
+          disabled={busy}
+          className="rounded-lg border border-line bg-raise px-2.5 py-1 text-[11.5px] text-paper transition hover:bg-white/10 disabled:text-muted"
+        >
+          {label()}
+        </button>
+        {info?.state === 'available' && (
+          <button
+            onClick={() => void window.lens.downloadUpdate()}
+            className="rounded-lg bg-sage px-2.5 py-1 text-[11.5px] font-semibold text-ink"
+          >
+            Download
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 /** A destructive action always names what it removes and cannot fire on one click. */
 function DangerButton({ label, confirmLabel, onConfirm }: {
   label: string
@@ -187,6 +246,11 @@ export function SettingsPanel({
           >
             Open documents folder
           </button>
+        </section>
+
+        <section>
+          <h3 className="readout mb-1.5 text-muted/70">Version</h3>
+          <UpdateRow />
         </section>
 
         <section>

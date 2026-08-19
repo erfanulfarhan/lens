@@ -5,6 +5,15 @@ export interface DoneInfo {
   sawScreen: boolean
 }
 
+export interface UpdateInfo {
+  state: 'idle' | 'checking' | 'available' | 'current' | 'error'
+  currentVersion: string
+  release?: { version: string; name: string; notes: string; pageUrl: string }
+  asset?: { name: string; url: string; size: number }
+  message?: string
+  checkedAt?: number
+}
+
 export interface SystemSpec {
   ramGb: number
   vramGb: number
@@ -94,6 +103,10 @@ declare global {
       systemCheck(): Promise<SystemCheck>
       pullModel(tag: string): Promise<boolean>
       openExternal(url: string): Promise<void>
+      checkUpdate(): Promise<UpdateInfo>
+      updateStatus(): Promise<UpdateInfo | null>
+      downloadUpdate(): Promise<boolean>
+      openReleaseNotes(): Promise<void>
       settings(): Promise<Record<string, unknown> | null>
       setApiKey(id: string, key: string): Promise<boolean>
       setProvider(id: string): Promise<boolean>
@@ -119,6 +132,7 @@ declare global {
       onTranscript(cb: (lines: TranscriptLine[]) => void): () => void
       onAudioError(cb: (message: string) => void): () => void
       onPullProgress(cb: (p: { tag: string; status: string; percent?: number }) => void): () => void
+      onUpdate(cb: (info: UpdateInfo) => void): () => void
       onDone(cb: (info: DoneInfo) => void): () => void
       onError(cb: (message: string) => void): () => void
       onSuppressed(cb: (p: { source: string; reason: string }) => void): () => void

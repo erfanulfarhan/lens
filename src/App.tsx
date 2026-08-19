@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ChatMessage, DoneInfo, SessionMeta, StatusInfo, TranscriptLine } from './lens.js'
+import type { ChatMessage, DoneInfo, SessionMeta, StatusInfo, TranscriptLine, UpdateInfo } from './lens.js'
 import { Sidebar } from './components/Sidebar.js'
 import { Composer } from './components/Composer.js'
 import { Readout } from './components/Readout.js'
@@ -10,6 +10,7 @@ import { Markdown } from './components/Markdown.js'
 import { Transcript } from './components/Transcript.js'
 import { detectPlatform, formatAccelerator } from './shortcuts.js'
 import { Onboarding } from './components/Onboarding.js'
+import { UpdateBanner } from './components/UpdateBanner.js'
 
 interface Turn {
   id: number
@@ -35,6 +36,11 @@ export default function App() {
   const [loadingModel, setLoadingModel] = useState<string | null>(null)
   const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434')
   const [hasKey, setHasKey] = useState<Record<string, boolean>>({})
+  const [update, setUpdate] = useState<UpdateInfo | null>(null)
+  // Dismissed per version, so a new release still gets one chance to be seen.
+  const [dismissedVersion, setDismissedVersion] = useState<string | null>(
+    () => localStorage.getItem('lens-update-dismissed')
+  )
   const [input, setInput] = useState('')
   const [screenAttached, setScreenAttached] = useState(false)
   const [lines, setLines] = useState<TranscriptLine[]>([])
@@ -64,6 +70,7 @@ export default function App() {
       window.lens.onStatus(setStatus),
       window.lens.onSessions(setSessions),
       window.lens.onScreenAttached(() => setScreenAttached(true)),
+      window.lens.onUpdate(setUpdate),
       window.lens.onTranscript(setLines),
       window.lens.onAudioError((m) =>
         setTurns((prev) => [...prev, { id: nextId.current++, role: 'assistant', text: m, error: true }])
@@ -274,6 +281,19 @@ export default function App() {
             <span aria-hidden>&times;</span>
           </button>
         </header>
+
+        {update?.state === 'available' && update.release?.version !== dismissedVersion && (
+          <UpdateBanner
+            info={update}
+            onDownload={() => void window.lens.downloadUpdate()}
+            onNotes={() => void window.lens.openReleaseNotes()}
+            onDismiss={() => {
+              const v = update.release?.version ?? ''
+              localStorage.setItem('lens-update-dismissed', v)
+              setDismissedVersion(v)
+            }}
+          />
+        )}
 
         {loadingModel && (
           <p className="border-b border-brass/20 bg-brass/10 px-3 py-2 text-[11px] leading-relaxed text-brass">

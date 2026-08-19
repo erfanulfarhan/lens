@@ -19,6 +19,7 @@ import { isSupported, SUPPORTED_EXTENSIONS } from './knowledge/extract.js'
 import { safeKnowledgeName } from './knowledge/safe-name.js'
 import { verifyVisionModels } from './providers/vision-probe.js'
 import { detectSystem, probeOllama } from './hardware/detect.js'
+import { checkForUpdate, type UpdateStatus } from './update/checker.js'
 import { SettingsStore, type Cipher } from './settings/store.js'
 import { providerFromSettings, type ProviderId } from './providers/index.js'
 import { recommendModels } from './hardware/recommend.js'
@@ -55,6 +56,7 @@ let askShortcut = ''
 let memory: MemoryStore | null = null
 let sessions: SessionStore | null = null
 let settings: SettingsStore | null = null
+let updateStatus: UpdateStatus | null = null
 let audio: AudioSupervisor | null = null
 const transcript = new TranscriptLog()
 const audioTurn = new AudioTurnTrigger()
@@ -604,6 +606,34 @@ app.whenReady().then(async () => {
       return false
     }
   })
+
+  // --- Updates ---
+  // The check is automatic; nothing is downloaded or installed without the user
+  // saying so, which is the whole point of asking first.
+  const runUpdateCheck = async () => {
+    updateStatus = { state: 'checking', currentVersion: app.getVersion() }
+    send('lens:update', updateStatus)
+    updateStatus = await checkForUpdate(app.getVersion())
+    send('lens:update', updateStatus)
+    return updateStatus
+  }
+
+  ipcMain.handle('lens:check-update', () => runUpdateCheck())
+  ipcMain.handle('lens:update-status', () => updateStatus)
+  // Downloading is a deliberate act: it opens the installer in the browser so the
+  // user can see what they are getting, since an unsigned build cannot install
+  // itself on macOS.
+  ipcMain.handle('lens:download-update', () => {
+    const url = updateStatus?.asset?.url ?? updateStatus?.release?.pageUrl
+    if (url) void shell.openExternal(url)
+    return Boolean(url)
+  })
+  ipcMain.handle('lens:open-release-notes', () => {
+    if (updateStatus?.release?.pageUrl) void shell.openExternal(updateStatus.release.pageUrl)
+  })
+
+  // Give the window a moment to paint before reaching for the network.
+  setTimeout(() => void runUpdateCheck(), 4000)
 
   ipcMain.handle('lens:open-external', (_e, url: string) => {
     // Only ever open http(s): a file or custom scheme here would be a hole.

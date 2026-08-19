@@ -1,5 +1,14 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 
+interface UpdateInfo {
+  state: 'idle' | 'checking' | 'available' | 'current' | 'error'
+  currentVersion: string
+  release?: { version: string; name: string; notes: string; pageUrl: string }
+  asset?: { name: string; url: string; size: number }
+  message?: string
+  checkedAt?: number
+}
+
 interface TranscriptLine {
   speaker: 'them' | 'you'
   text: string
@@ -52,6 +61,10 @@ contextBridge.exposeInMainWorld('lens', {
   systemCheck: () => ipcRenderer.invoke('lens:system-check'),
   pullModel: (tag: string) => ipcRenderer.invoke('lens:pull-model', tag),
   openExternal: (url: string) => ipcRenderer.invoke('lens:open-external', url),
+  checkUpdate: () => ipcRenderer.invoke('lens:check-update'),
+  updateStatus: () => ipcRenderer.invoke('lens:update-status'),
+  downloadUpdate: () => ipcRenderer.invoke('lens:download-update'),
+  openReleaseNotes: () => ipcRenderer.invoke('lens:open-release-notes'),
   settings: () => ipcRenderer.invoke('lens:settings'),
   setApiKey: (id: string, key: string) => ipcRenderer.invoke('lens:set-api-key', id, key),
   setProvider: (id: string) => ipcRenderer.invoke('lens:set-provider', id),
@@ -73,6 +86,7 @@ contextBridge.exposeInMainWorld('lens', {
   onTranscript: on<TranscriptLine[]>('lens:transcript'),
   onAudioError: on<string>('lens:audio-error'),
   onPullProgress: on<{ tag: string; status: string; percent?: number }>('lens:pull-progress'),
+  onUpdate: on<UpdateInfo>('lens:update'),
   onDone: on<{
     servedBy: string
     cacheReadTokens: number
