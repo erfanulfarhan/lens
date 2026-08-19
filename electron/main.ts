@@ -644,9 +644,12 @@ app.whenReady().then(async () => {
   // The check is automatic; nothing is downloaded or installed without the user
   // saying so, which is the whole point of asking first.
   const runUpdateCheck = async () => {
-    updateStatus = { state: 'checking', currentVersion: app.getVersion() }
+    // LENS_FAKE_VERSION lets the update path be exercised without publishing a
+    // release first. Development only; the packaged app has no such variable.
+    const current = (!app.isPackaged && process.env.LENS_FAKE_VERSION) || app.getVersion()
+    updateStatus = { state: 'checking', currentVersion: current }
     send('lens:update', updateStatus)
-    updateStatus = await checkForUpdate(app.getVersion())
+    updateStatus = await checkForUpdate(current)
     send('lens:update', updateStatus)
     return updateStatus
   }

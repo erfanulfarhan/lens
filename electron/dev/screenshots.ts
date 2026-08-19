@@ -90,5 +90,11 @@ export async function captureScreenshots(panel: BrowserWindow, outDir: string): 
   await click('button[title="Settings"]')
   await shot('04-settings', 900, 900)  // settings is a tall list
 
+  // The update banner, if the run was given an older version to report.
+  if (process.env.LENS_FAKE_VERSION) {
+    await wait(6000) // the check fires a few seconds after launch
+    await shot('06-update', 1120, 660)
+  }
+
   console.log('[shots] done')
 }
