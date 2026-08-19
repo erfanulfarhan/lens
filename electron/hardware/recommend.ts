@@ -41,6 +41,8 @@ export const CATALOG: ModelRec[] = [
     note: 'Excellent and answers directly' },
   { tag: 'qwen3-vl:32b', label: 'Qwen3-VL 32B', sizeGb: 20.9, needsGb: 24, vision: true,
     note: 'Strongest reasoning, but thinks before answering so it is slower' },
+  { tag: 'qwen3.8:27b', label: 'Qwen3.8 27B', sizeGb: 17.7, needsGb: 20, vision: true,
+    note: 'Newest Qwen with vision; reasons before answering, so slower' },
   { tag: 'gemma3:27b', label: 'Gemma 3 27B', sizeGb: 17.4, needsGb: 20, vision: true,
     note: 'Excellent reasoning and screen reading' },
   { tag: 'mistral-small3.2:24b', label: 'Mistral Small 3.2', sizeGb: 15.2, needsGb: 18, vision: true,
