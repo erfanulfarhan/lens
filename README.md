@@ -40,8 +40,21 @@ built the other way round. You host the model, you pick it, you keep the data.
 
 ## Install
 
-Download the installer for your platform from
-[Releases](../../releases), or build it yourself:
+Download for your platform from [Releases](../../releases):
+
+| Platform | File |
+|---|---|
+| macOS, Apple Silicon | `Lens-*-arm64.dmg` |
+| macOS, Intel | `Lens-*.dmg` |
+| Windows | `Lens-Setup-*.exe` |
+| Linux, any distribution | `Lens-*.AppImage` |
+| Debian, Ubuntu, Mint | `lens_*_amd64.deb` |
+| Fedora, RHEL, openSUSE | `lens-*.x86_64.rpm` |
+
+Arm64 builds are published for Linux too. On Linux, make the AppImage executable
+first (`chmod +x Lens-*.AppImage`) and run it; no installation needed.
+
+Or build it yourself:
 
 ```bash
 git clone https://github.com/erfanulfarhan/lens.git
@@ -52,7 +65,12 @@ npm run dev
 ```
 
 The installers are not code-signed yet. On macOS, right-click the app and choose
-**Open** the first time. On Windows, choose **More info → Run anyway**.
+**Open** the first time. On Windows, choose **More info → Run anyway**. Linux needs
+nothing special.
+
+Listening to calls is macOS only: it uses a small Swift helper built against
+ScreenCaptureKit, which has no equivalent on other platforms. Everything else works
+everywhere.
 
 ## Running a model locally
 

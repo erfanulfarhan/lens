@@ -121,5 +121,13 @@ export function assetFor(
       : dmgs.find((a) => !/arm64/i.test(a.name))
     return wanted ?? dmgs[0] ?? null
   }
-  return assets.find((a) => a.name.endsWith('.AppImage')) ?? null
+  // AppImage on Linux: it is the only format that runs on any distribution and
+  // needs no package manager, so it is what an in-app update can actually apply.
+  // Architecture matters as much as on macOS, since an x64 build will not run on
+  // an arm64 machine.
+  const images = assets.filter((a) => a.name.endsWith('.AppImage'))
+  const wanted = arch === 'arm64'
+    ? images.find((a) => /arm64|aarch64/i.test(a.name))
+    : images.find((a) => !/arm64|aarch64/i.test(a.name))
+  return wanted ?? images[0] ?? null
 }

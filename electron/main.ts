@@ -415,7 +415,7 @@ app.whenReady().then(async () => {
     (app.isPackaged
       ? join(process.resourcesPath, 'bin', 'lens-audio')
       : join(app.getAppPath(), 'bin', 'lens-audio'))
-  audio = new AudioSupervisor(helper)
+  audio = new AudioSupervisor(helper, process.platform)
   audio.onEvent((event) => {
     switch (event.type) {
       case 'transcript':

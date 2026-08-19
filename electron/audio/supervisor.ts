@@ -16,10 +16,19 @@ export class AudioSupervisor {
   private stopping = false
   private listeners: Array<(e: AudioEvent) => void> = []
 
-  constructor(private binaryPath: string) {}
+  constructor(
+    private binaryPath: string,
+    private platform: NodeJS.Platform = process.platform
+  ) {}
 
+  /**
+   * The helper is a macOS binary built against ScreenCaptureKit and Speech, so it
+   * cannot run anywhere else. Checking only that the file exists would offer a
+   * Listen button on Windows and Linux that fails the moment it is pressed, since
+   * the file ships in the bundle on every platform.
+   */
   get available(): boolean {
-    return existsSync(this.binaryPath)
+    return this.platform === 'darwin' && existsSync(this.binaryPath)
   }
 
   get running(): boolean {

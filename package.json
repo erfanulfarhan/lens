@@ -12,7 +12,8 @@
     "dist": "npm run build && electron-builder --mac --win",
     "dist:mac": "npm run build && electron-builder --mac",
     "dist:win": "npm run build && electron-builder --win",
-    "native": "mkdir -p bin && cd native/lens-audio && swift build -c release && cp .build/release/lens-audio ../../bin/"
+    "native": "mkdir -p bin && cd native/lens-audio && swift build -c release && cp .build/release/lens-audio ../../bin/",
+    "dist:linux": "npm run build && electron-builder --linux"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -38,7 +39,8 @@
     "react-dom": "^19.0.0"
   },
   "author": {
-    "name": "Erfanul Hakim Farhan"
+    "name": "Erfanul Hakim Farhan",
+    "email": "ershadul@datacenters.com"
   },
   "license": "MIT",
   "build": {
@@ -54,13 +56,6 @@
       "package.json"
     ],
     "extraResources": [
-      {
-        "from": "bin",
-        "to": "bin",
-        "filter": [
-          "**/*"
-        ]
-      },
       {
         "from": "build/icon.png",
         "to": "build/icon.png"
@@ -93,7 +88,20 @@
       },
       "identity": null,
       "type": "distribution",
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "extraResources": [
+        {
+          "from": "bin",
+          "to": "bin",
+          "filter": [
+            "**/*"
+          ]
+        },
+        {
+          "from": "build/icon.png",
+          "to": "build/icon.png"
+        }
+      ]
     },
     "dmg": {
       "title": "Lens ${version}",
@@ -131,10 +139,36 @@
     },
     "linux": {
       "icon": "build/icon.png",
+      "category": "Utility",
+      "synopsis": "A screen-aware AI assistant that runs on your own machine",
+      "description": "Lens reads your screen when you ask it to and answers from your own documents, with the model running locally through Ollama or on any API key you own.",
+      "desktop": {
+        "entry": {
+          "Keywords": "ai;assistant;llm;ollama;screenshot;"
+        }
+      },
       "target": [
-        "AppImage"
-      ],
-      "category": "Utility"
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "rpm",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     },
     "afterPack": "build/afterPack.cjs",
     "copyright": "Copyright \u00a9 2026 Erfanul Hakim Farhan"

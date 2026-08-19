@@ -109,3 +109,37 @@ describe('assetFor', () => {
     expect(assetFor(empty, 'darwin', 'arm64')).toBeNull()
   })
 })
+
+describe('assetFor on Linux', () => {
+  const release = parseRelease({
+    tag_name: 'v0.1.3',
+    assets: [
+      { name: 'Lens-0.1.3.AppImage', browser_download_url: 'https://d/x64.AppImage', size: 1 },
+      { name: 'Lens-0.1.3-arm64.AppImage', browser_download_url: 'https://d/arm64.AppImage', size: 1 },
+      { name: 'lens_0.1.3_amd64.deb', browser_download_url: 'https://d/amd64.deb', size: 1 },
+      { name: 'lens-0.1.3.x86_64.rpm', browser_download_url: 'https://d/x86.rpm', size: 1 },
+    ],
+  })!
+
+  // AppImage is the only Linux format an in-app update can apply without a
+  // package manager and root.
+  it('prefers the AppImage over deb or rpm', () => {
+    expect(assetFor(release, 'linux', 'x64')?.name).toBe('Lens-0.1.3.AppImage')
+  })
+
+  it('picks the arm64 AppImage on arm64', () => {
+    expect(assetFor(release, 'linux', 'arm64')?.name).toContain('arm64')
+  })
+
+  it('does not hand an x64 machine the arm64 build', () => {
+    expect(assetFor(release, 'linux', 'x64')?.name).not.toContain('arm64')
+  })
+
+  it('returns null when no AppImage is published', () => {
+    const only = parseRelease({
+      tag_name: 'v1.0.0',
+      assets: [{ name: 'lens_1.0.0_amd64.deb', browser_download_url: 'https://d/a.deb', size: 1 }],
+    })!
+    expect(assetFor(only, 'linux', 'x64')).toBeNull()
+  })
+})
