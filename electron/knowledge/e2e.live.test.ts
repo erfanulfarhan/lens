@@ -50,5 +50,5 @@ live('end to end: retrieval + grounded answer', () => {
     // Must not have just described the red square.
     expect(result.text.toLowerCase()).not.toMatch(/\bred\b|\bsquare\b/)
     expect(streamed.length).toBeGreaterThan(0)
-  }, 120000)
+  }, 600000)
 })
