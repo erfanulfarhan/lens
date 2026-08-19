@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { recommendModels, usableMemoryGb, type SystemSpec } from './recommend.js'
+import { CATALOG, recommendModels, usableMemoryGb, type SystemSpec } from './recommend.js'
 
 const spec = (p: Partial<SystemSpec>): SystemSpec => ({
   ramGb: 16, vramGb: 0, unifiedMemory: false, ...p,
@@ -49,10 +49,29 @@ describe('recommendModels', () => {
     expect(r.reason).toContain('API key')
   })
 
-  it('offers alternatives ordered strongest first', () => {
+  // The catalogue order encodes preference, not size: a model that answers
+  // directly outranks a slightly larger one that reasons first, because reasoning
+  // costs two to three times the tokens for a glanceable answer.
+  it('keeps alternatives in catalogue order, below the recommendation', () => {
     const r = recommendModels(spec({ vramGb: 12 }))
     expect(r.alternatives.length).toBeGreaterThan(0)
-    const sizes = r.alternatives.map((m) => m.needsGb)
-    expect([...sizes].sort((a, b) => b - a)).toEqual(sizes)
+
+    const order = CATALOG.map((m) => m.tag)
+    const positions = r.alternatives.map((m) => order.indexOf(m.tag))
+    expect([...positions].sort((a, b) => a - b)).toEqual(positions)
+    expect(positions[0]).toBeGreaterThan(order.indexOf(r.best!.tag))
+  })
+
+  // A text-only model would install cleanly and then fail at the app's purpose.
+  it('only ever offers models that can read a screen', () => {
+    for (const m of CATALOG) expect(m.vision, `${m.tag} must support vision`).toBe(true)
+  })
+
+  it('never recommends a model that does not fit', () => {
+    for (const vramGb of [4, 6, 8, 12, 16, 24, 48, 64]) {
+      const r = recommendModels(spec({ vramGb }))
+      if (r.best) expect(r.best.needsGb).toBeLessThanOrEqual(r.usableGb)
+      for (const alt of r.alternatives) expect(alt.needsGb).toBeLessThanOrEqual(r.usableGb)
+    }
   })
 })
