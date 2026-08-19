@@ -105,7 +105,8 @@ declare global {
       openExternal(url: string): Promise<void>
       checkUpdate(): Promise<UpdateInfo>
       updateStatus(): Promise<UpdateInfo | null>
-      downloadUpdate(): Promise<boolean>
+      downloadUpdate(): Promise<{ ok: boolean; message: string; selfInstalling?: boolean }>
+      cancelUpdateDownload(): Promise<void>
       openReleaseNotes(): Promise<void>
       settings(): Promise<Record<string, unknown> | null>
       setApiKey(id: string, key: string): Promise<boolean>
@@ -133,6 +134,7 @@ declare global {
       onAudioError(cb: (message: string) => void): () => void
       onPullProgress(cb: (p: { tag: string; status: string; percent?: number }) => void): () => void
       onUpdate(cb: (info: UpdateInfo) => void): () => void
+      onUpdateProgress(cb: (p: { percent: number; phase: string; message?: string }) => void): () => void
       onDone(cb: (info: DoneInfo) => void): () => void
       onError(cb: (message: string) => void): () => void
       onSuppressed(cb: (p: { source: string; reason: string }) => void): () => void

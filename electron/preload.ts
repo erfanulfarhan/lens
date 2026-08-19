@@ -64,6 +64,7 @@ contextBridge.exposeInMainWorld('lens', {
   checkUpdate: () => ipcRenderer.invoke('lens:check-update'),
   updateStatus: () => ipcRenderer.invoke('lens:update-status'),
   downloadUpdate: () => ipcRenderer.invoke('lens:download-update'),
+  cancelUpdateDownload: () => ipcRenderer.invoke('lens:cancel-update-download'),
   openReleaseNotes: () => ipcRenderer.invoke('lens:open-release-notes'),
   settings: () => ipcRenderer.invoke('lens:settings'),
   setApiKey: (id: string, key: string) => ipcRenderer.invoke('lens:set-api-key', id, key),
@@ -87,6 +88,7 @@ contextBridge.exposeInMainWorld('lens', {
   onAudioError: on<string>('lens:audio-error'),
   onPullProgress: on<{ tag: string; status: string; percent?: number }>('lens:pull-progress'),
   onUpdate: on<UpdateInfo>('lens:update'),
+  onUpdateProgress: on<{ percent: number; phase: string; message?: string }>('lens:update-progress'),
   onDone: on<{
     servedBy: string
     cacheReadTokens: number

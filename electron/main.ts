@@ -20,6 +20,8 @@ import { safeKnowledgeName } from './knowledge/safe-name.js'
 import { verifyVisionModels } from './providers/vision-probe.js'
 import { detectSystem, probeOllama } from './hardware/detect.js'
 import { checkForUpdate, type UpdateStatus } from './update/checker.js'
+import { downloadInstaller } from './update/download.js'
+import { canSelfInstall, installUpdate } from './update/install.js'
 import { SettingsStore, type Cipher } from './settings/store.js'
 import { providerFromSettings, type ProviderId } from './providers/index.js'
 import { recommendModels } from './hardware/recommend.js'
@@ -620,13 +622,54 @@ app.whenReady().then(async () => {
 
   ipcMain.handle('lens:check-update', () => runUpdateCheck())
   ipcMain.handle('lens:update-status', () => updateStatus)
-  // Downloading is a deliberate act: it opens the installer in the browser so the
-  // user can see what they are getting, since an unsigned build cannot install
-  // itself on macOS.
-  ipcMain.handle('lens:download-update', () => {
-    const url = updateStatus?.asset?.url ?? updateStatus?.release?.pageUrl
-    if (url) void shell.openExternal(url)
-    return Boolean(url)
+  // Downloads inside the app and then installs, so nobody has to visit GitHub.
+  // Still only ever after the user asks for it.
+  let downloading: AbortController | null = null
+
+  ipcMain.handle('lens:download-update', async () => {
+    const asset = updateStatus?.asset
+    if (!asset) {
+      // No installer for this platform: the release page is the honest fallback.
+      if (updateStatus?.release?.pageUrl) void shell.openExternal(updateStatus.release.pageUrl)
+      return { ok: false, message: 'No installer for this platform. Opened the release page.' }
+    }
+    if (downloading) return { ok: false, message: 'Already downloading.' }
+
+    downloading = new AbortController()
+    send('lens:update-progress', { percent: 0, phase: 'downloading' })
+
+    try {
+      const dir = join(app.getPath('downloads'), 'Lens updates')
+      const file = await downloadInstaller(
+        asset.url,
+        dir,
+        (p) => send('lens:update-progress', { percent: p.percent, phase: 'downloading' }),
+        downloading.signal
+      )
+
+      send('lens:update-progress', { percent: 100, phase: 'installing' })
+      const outcome = installUpdate(file)
+      send('lens:update-progress', { percent: 100, phase: 'done', message: outcome.message })
+
+      if (outcome.quitting) {
+        // Give the renderer a moment to show the message before the app closes.
+        setTimeout(() => app.quit(), 1200)
+      }
+      return { ok: true, message: outcome.message, selfInstalling: canSelfInstall() }
+    } catch (err) {
+      const message = (err as Error).name === 'AbortError'
+        ? 'Download cancelled.'
+        : (err as Error).message
+      send('lens:update-progress', { percent: 0, phase: 'error', message })
+      return { ok: false, message }
+    } finally {
+      downloading = null
+    }
+  })
+
+  ipcMain.handle('lens:cancel-update-download', () => {
+    downloading?.abort()
+    downloading = null
   })
   ipcMain.handle('lens:open-release-notes', () => {
     if (updateStatus?.release?.pageUrl) void shell.openExternal(updateStatus.release.pageUrl)

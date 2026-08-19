@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { UpdateInfo } from '../lens.js'
 
 /**
@@ -18,7 +18,12 @@ export function UpdateBanner({
   onDismiss(): void
 }) {
   const [expanded, setExpanded] = useState(false)
+  const [progress, setProgress] = useState<{ percent: number; phase: string; message?: string } | null>(null)
+
+  useEffect(() => window.lens.onUpdateProgress(setProgress), [])
+
   if (info.state !== 'available' || !info.release) return null
+  const busy = progress !== null && progress.phase !== 'error' && progress.phase !== 'done'
 
   const size = info.asset ? `${Math.round(info.asset.size / 1e6)}MB` : null
 
@@ -45,13 +50,39 @@ export function UpdateBanner({
         </pre>
       )}
 
+      {progress && (
+        <div className="mt-2">
+          <div className="h-1 overflow-hidden rounded-full bg-raise">
+            <div
+              className="h-full rounded-full bg-sage transition-all"
+              style={{ width: `${progress.percent}%` }}
+            />
+          </div>
+          <p className="readout mt-1.5 text-muted">
+            {progress.phase === 'downloading' && `downloading ${progress.percent}%`}
+            {progress.phase === 'installing' && 'installing'}
+            {progress.phase === 'done' && (progress.message ?? 'done')}
+            {progress.phase === 'error' && (progress.message ?? 'failed')}
+          </p>
+        </div>
+      )}
+
       <div className="mt-2 flex items-center gap-1.5">
         <button
           onClick={onDownload}
-          className="rounded-lg bg-sage px-2.5 py-1 text-[11.5px] font-semibold text-ink transition hover:bg-sage/90"
+          disabled={busy}
+          className="rounded-lg bg-sage px-2.5 py-1 text-[11.5px] font-semibold text-ink transition hover:bg-sage/90 disabled:bg-raise disabled:text-muted"
         >
-          Download{size ? ` (${size})` : ''}
+          {busy ? 'Working…' : `Update now${size ? ` (${size})` : ''}`}
         </button>
+        {busy && (
+          <button
+            onClick={() => void window.lens.cancelUpdateDownload()}
+            className="rounded-lg px-2 py-1 text-[11.5px] text-muted transition hover:text-paper"
+          >
+            Cancel
+          </button>
+        )}
         {info.release.notes && (
           <button
             onClick={() => setExpanded((v) => !v)}
