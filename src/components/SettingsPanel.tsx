@@ -95,6 +95,8 @@ interface Props {
   status: StatusInfo | null
   ollamaUrl: string
   hasKey: Record<string, boolean>
+  theme: 'dark' | 'light' | 'system'
+  onSetTheme(t: 'dark' | 'light' | 'system'): void
   onSaveOllamaUrl(url: string): void
   onSetKey(id: string, key: string): Promise<void>
   onSetProvider(id: string): Promise<void>
@@ -109,7 +111,7 @@ interface Props {
 }
 
 export function SettingsPanel({
-  status, files, ollamaUrl, hasKey, onSaveOllamaUrl, onSetKey, onSetProvider, onClose,
+  status, files, ollamaUrl, hasKey, theme, onSetTheme, onSaveOllamaUrl, onSetKey, onSetProvider, onClose,
   onClearMemory, onClearHistory, onClearKnowledge, onRemoveFile, onOpenKnowledge,
   onSaveAboutMe,
 }: Props) {
@@ -246,6 +248,29 @@ export function SettingsPanel({
           >
             Open documents folder
           </button>
+        </section>
+
+        <section>
+          <h3 className="readout mb-1.5 text-muted/70">Appearance</h3>
+          <p className="mb-2 text-[11px] leading-relaxed text-muted">
+            Dark suits an overlay at night; light reads better on a bright screen.
+          </p>
+          <div className="flex gap-1">
+            {(['dark', 'light', 'system'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => onSetTheme(t)}
+                className={
+                  'flex-1 rounded-lg border px-2 py-1.5 text-[11.5px] capitalize transition ' +
+                  (theme === t
+                    ? 'border-brass/45 bg-brass/10 text-brass'
+                    : 'border-line bg-raise text-muted hover:text-paper')
+                }
+              >
+                {t}
+              </button>
+            ))}
+          </div>
         </section>
 
         <section>

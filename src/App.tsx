@@ -11,6 +11,9 @@ import { Transcript } from './components/Transcript.js'
 import { detectPlatform, formatAccelerator } from './shortcuts.js'
 import { Onboarding } from './components/Onboarding.js'
 import { UpdateBanner } from './components/UpdateBanner.js'
+import { Feedback } from './components/Feedback.js'
+import type { Command } from './commands.js'
+import { applyTheme, readStoredTheme, resolveTheme, type ThemeChoice } from './theme.js'
 
 interface Turn {
   id: number
@@ -37,6 +40,7 @@ export default function App() {
   const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434')
   const [hasKey, setHasKey] = useState<Record<string, boolean>>({})
   const [update, setUpdate] = useState<UpdateInfo | null>(null)
+  const [theme, setTheme] = useState<ThemeChoice>(() => readStoredTheme((k) => localStorage.getItem(k)))
   // Dismissed per version, so a new release still gets one chance to be seen.
   const [dismissedVersion, setDismissedVersion] = useState<string | null>(
     () => localStorage.getItem('lens-update-dismissed')
@@ -131,6 +135,17 @@ export default function App() {
   }, [turns])
 
   useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)')
+    const apply = () => applyTheme(document.documentElement, resolveTheme(theme, media.matches))
+    apply()
+    localStorage.setItem('lens-theme', theme)
+    // Only listen while following the system, so an explicit choice stays put.
+    if (theme !== 'system') return
+    media.addEventListener('change', apply)
+    return () => media.removeEventListener('change', apply)
+  }, [theme])
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (settings) setSettings(false)
@@ -145,6 +160,31 @@ export default function App() {
     const next = !sidebar
     setSidebar(next)
     void window.lens.setSidebar(next)
+  }
+
+  async function runCommand(c: Command) {
+    switch (c.id) {
+      case 'export': {
+        const r = await window.lens.exportSession('md')
+        if (!r.ok) setTurns((p) => [...p, { id: nextId.current++, role: 'assistant', text: r.message, error: true }])
+        return
+      }
+      case 'new': return void newChat()
+      case 'clear': return setTurns([])
+      case 'settings': return setSettings(true)
+      case 'docs': return void attach()
+      case 'web': return void window.lens.setWeb(!status?.webEnabled)
+      case 'model': {
+        setSidebar(false)
+        setSettings(true)
+        return
+      }
+      default:
+        // The rest are questions. A screen command captures first, and the
+        // pending capture is consumed by the next ask.
+        if (c.needsScreen) await window.lens.captureScreen()
+        return void window.lens.ask(c.prompt ?? c.hint)
+    }
   }
 
   function send() {
@@ -363,7 +403,12 @@ export default function App() {
                 ) : (
                   <Thinking reasoning={reasoning} />
                 )}
-                {t.done && <Readout info={t.done} docs={status?.knowledgeBlocks ?? 0} />}
+                {t.done && (
+                  <div className="group flex items-center gap-2">
+                    <Readout info={t.done} docs={status?.knowledgeBlocks ?? 0} />
+                    <Feedback answer={t.text} />
+                  </div>
+                )}
               </div>
             )
           )}
@@ -411,6 +456,7 @@ export default function App() {
           onChange={setInput}
           onSubmit={send}
           onAttach={() => void attach()}
+          onCommand={(c) => void runCommand(c)}
         />
       </div>
 
@@ -446,6 +492,8 @@ export default function App() {
           onOpenKnowledge={() => void window.lens.openKnowledgeFolder()}
           onSaveAboutMe={(text) => void window.lens.addAboutMe(text)}
           ollamaUrl={ollamaUrl}
+          theme={theme}
+          onSetTheme={setTheme}
           hasKey={hasKey}
           onSetKey={async (id, key) => {
             await window.lens.setApiKey(id, key)

@@ -86,6 +86,8 @@ declare global {
       deleteSession(id: string): Promise<void>
       renameSession(id: string, title: string): Promise<void>
       searchSessions(q: string): Promise<SessionMeta[]>
+      exportSession(format: 'md' | 'txt' | 'json'): Promise<{ ok: boolean; message: string }>
+      rateAnswer(answer: string, rating: 'good' | 'bad' | null): Promise<boolean>
       clearMemory(): Promise<boolean>
       clearHistory(): Promise<boolean>
       clearKnowledge(): Promise<boolean>

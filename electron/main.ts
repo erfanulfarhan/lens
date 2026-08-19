@@ -10,6 +10,7 @@ import { ollamaBaseUrl } from './providers/ollama-url.js'
 import { OllamaEmbedder as EmbedderForMem } from './knowledge/embedder.js'
 import { MemoryStore } from './memory/store.js'
 import { SessionStore } from './history/sessions.js'
+import { exportSession } from './history/export.js'
 import { AudioSupervisor } from './audio/supervisor.js'
 import { TranscriptLog } from './audio/protocol.js'
 import { AudioTurnTrigger } from './triggers/audio-turn.js'
@@ -540,6 +541,36 @@ app.whenReady().then(async () => {
     send('lens:sessions', sessions?.list() ?? [])
   })
   ipcMain.handle('lens:session-search', (_e, q: string) => sessions?.search(q) ?? [])
+
+  // Export the open chat. A save dialog rather than a fixed folder, so the file
+  // lands where the user will look for it.
+  ipcMain.handle('lens:export-session', async (_e, format: 'md' | 'txt' | 'json') => {
+    const session = sessions?.active
+    if (!session || session.messages.length === 0) {
+      return { ok: false, message: 'This chat is empty.' }
+    }
+
+    const { content, fileName } = exportSession(session, format, app.getVersion())
+    const { canceled, filePath } = await dialog.showSaveDialog(panel!, {
+      title: 'Save chat',
+      defaultPath: pathJoin(app.getPath('documents'), fileName),
+      filters: [{ name: format.toUpperCase(), extensions: [format] }],
+    })
+    if (canceled || !filePath) return { ok: false, message: 'Cancelled.' }
+
+    await writeFile(filePath, content, 'utf8')
+    // Reveal rather than open: the user chose where it goes, so show them it is there.
+    shell.showItemInFolder(filePath)
+    return { ok: true, message: `Saved ${pathJoin(filePath).split('/').pop()}` }
+  })
+
+  // Feedback on an answer. Stored against the exchange and acted on in recall:
+  // a rejected answer is never offered back to the model.
+  ipcMain.handle('lens:rate-answer', async (_e, answer: string, rating: 'good' | 'bad' | null) => {
+    const ok = (await memory?.rate(answer, rating)) ?? false
+    pushStatus()
+    return ok
+  })
   // The panel widens for the sidebar rather than squeezing the conversation, and
   // it grows LEFTWARD so its right edge stays put. Repositioning against the
   // screen edge instead made the whole window appear to jump sideways.

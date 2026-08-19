@@ -1,4 +1,6 @@
-import { useRef, type FormEvent, type KeyboardEvent } from 'react'
+import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { COMMANDS, commandQuery, matchCommands, moveSelection, type Command } from '../commands.js'
+import { CommandMenu } from './CommandMenu.js'
 
 interface Props {
   value: string
@@ -9,10 +11,29 @@ interface Props {
   onChange(v: string): void
   onSubmit(): void
   onAttach(): void
+  onCommand(c: Command): void
 }
 
-export function Composer({ value, busy, screenAttached, fileCount, onChange, onSubmit, onAttach }: Props) {
+export function Composer({
+  value, busy, screenAttached, fileCount, onChange, onSubmit, onAttach, onCommand,
+}: Props) {
   const box = useRef<HTMLTextAreaElement>(null)
+  const [selected, setSelected] = useState(0)
+  const [dismissed, setDismissed] = useState(false)
+
+  const query = commandQuery(value)
+  const matches = useMemo(
+    () => (query === null ? [] : matchCommands(query, COMMANDS)),
+    [query]
+  )
+  const menuOpen = query !== null && !dismissed && matches.length > 0
+
+  function run(c: Command) {
+    onChange('')
+    setDismissed(false)
+    setSelected(0)
+    onCommand(c)
+  }
 
   function submit(e?: FormEvent) {
     e?.preventDefault()
@@ -21,7 +42,26 @@ export function Composer({ value, busy, screenAttached, fileCount, onChange, onS
   }
 
   // Enter sends, Shift+Enter makes a new line: the convention people expect.
+  // While the command menu is open the arrows and Enter belong to it instead.
   function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+    if (menuOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelected((i) => moveSelection(i, e.key === 'ArrowDown' ? 1 : -1, matches.length))
+        return
+      }
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault()
+        run(matches[selected] ?? matches[0])
+        return
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setDismissed(true)
+        return
+      }
+    }
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       submit()
@@ -29,7 +69,18 @@ export function Composer({ value, busy, screenAttached, fileCount, onChange, onS
   }
 
   return (
-    <form onSubmit={submit} className="no-drag border-t border-line bg-panel/80 px-3 py-2.5">
+    <form onSubmit={submit} className="no-drag border-t border-line bg-panel/80 pb-2.5 pt-0">
+      {menuOpen && (
+        <div className="-mx-3 pt-2">
+          <CommandMenu
+            commands={matches}
+            selected={Math.min(selected, matches.length - 1)}
+            onPick={run}
+            onHover={setSelected}
+          />
+        </div>
+      )}
+      <div className="px-3 pt-2.5">
       <div className="flex items-end gap-2">
         <button
           type="button"
@@ -50,6 +101,9 @@ export function Composer({ value, busy, screenAttached, fileCount, onChange, onS
           rows={1}
           value={value}
           onChange={(e) => {
+            // Typing again after dismissing should offer the menu once more.
+            if (dismissed) setDismissed(false)
+            setSelected(0)
             onChange(e.target.value)
             const el = e.currentTarget
             el.style.height = 'auto'
@@ -67,6 +121,7 @@ export function Composer({ value, busy, screenAttached, fileCount, onChange, onS
         >
           {busy ? '…' : 'Ask'}
         </button>
+        </div>
       </div>
     </form>
   )

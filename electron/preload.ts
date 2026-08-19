@@ -43,6 +43,9 @@ contextBridge.exposeInMainWorld('lens', {
   deleteSession: (id: string) => ipcRenderer.invoke('lens:session-delete', id),
   renameSession: (id: string, title: string) => ipcRenderer.invoke('lens:session-rename', id, title),
   searchSessions: (q: string) => ipcRenderer.invoke('lens:session-search', q),
+  exportSession: (format: 'md' | 'txt' | 'json') => ipcRenderer.invoke('lens:export-session', format),
+  rateAnswer: (answer: string, rating: 'good' | 'bad' | null) =>
+    ipcRenderer.invoke('lens:rate-answer', answer, rating),
   // Memory + knowledge
   clearMemory: () => ipcRenderer.invoke('lens:clear-memory'),
   clearHistory: () => ipcRenderer.invoke('lens:clear-history'),

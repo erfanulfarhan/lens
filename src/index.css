@@ -21,6 +21,18 @@
   --font-read: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, monospace;
 }
 
+[data-theme="light"] {
+  --color-ink: #f2f0ec;
+  --color-panel: #ffffff;
+  --color-raise: #eceae5;
+  --color-line: #dcd8d1;
+  --color-brass: #8a6320;
+  --color-brass-dim: #a98336;
+  --color-sage: #3f6b4d;
+  --color-paper: #1b1d22;
+  --color-muted: #61646c;
+}
+
 html, body, #root { height: 100%; margin: 0; background: transparent; }
 body {
   font-family: var(--font-ui);

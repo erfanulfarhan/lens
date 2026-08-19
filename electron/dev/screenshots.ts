@@ -62,6 +62,31 @@ export async function captureScreenshots(panel: BrowserWindow, outDir: string): 
   await shot('03-history', 1360, 720)  // wider and taller: it holds the sidebar too
   await click('button[title="Chat history"]')
 
+  // The command menu: type a slash and photograph what appears.
+  await panel.webContents.executeJavaScript(`
+    (() => {
+      const box = document.querySelector('textarea')
+      if (!box) return
+      const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set
+      setter.call(box, '/')
+      box.dispatchEvent(new Event('input', { bubbles: true }))
+    })()
+  `)
+  await wait(900)
+  await shot('05-commands', 1120, 660)
+
+  // Clear it again so settings is not photographed with a menu over it.
+  await panel.webContents.executeJavaScript(`
+    (() => {
+      const box = document.querySelector('textarea')
+      if (!box) return
+      const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set
+      setter.call(box, '')
+      box.dispatchEvent(new Event('input', { bubbles: true }))
+    })()
+  `)
+  await wait(400)
+
   await click('button[title="Settings"]')
   await shot('04-settings', 900, 900)  // settings is a tall list
 

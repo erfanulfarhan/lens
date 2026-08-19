@@ -125,3 +125,57 @@ describe('feedback-loop prevention', () => {
     expect(m.recent(5)[0].answer).toContain('data science')
   })
 })
+
+describe('answer ratings', () => {
+  it('records a rating against the matching exchange', async () => {
+    const m = new MemoryStore(path, fakeEmbedder)
+    await m.add('about python', 'Strong in python.')
+    expect(await m.rate('Strong in python.', 'good')).toBe(true)
+    expect(m.recent(5)[0].rating).toBe('good')
+  })
+
+  it('reports when there is nothing to rate', async () => {
+    const m = new MemoryStore(path, fakeEmbedder)
+    expect(await m.rate('never said this', 'bad')).toBe(false)
+  })
+
+  it('clears a rating when passed null', async () => {
+    const m = new MemoryStore(path, fakeEmbedder)
+    await m.add('q', 'an answer')
+    await m.rate('an answer', 'bad')
+    await m.rate('an answer', null)
+    expect(m.recent(5)[0].rating).toBeUndefined()
+  })
+
+  it('survives a reload', async () => {
+    const a = new MemoryStore(path, fakeEmbedder)
+    await a.add('q', 'an answer')
+    await a.rate('an answer', 'good')
+
+    const b = new MemoryStore(path, fakeEmbedder)
+    await b.load()
+    expect(b.recent(5)[0].rating).toBe('good')
+  })
+
+  // Collecting a rating and then ignoring it would be theatre; a rejected answer
+  // must actually stop being offered back to the model.
+  it('never recalls an answer the user rejected', async () => {
+    const m = new MemoryStore(path, fakeEmbedder)
+    await m.add('my python skills', 'Weak and wrong about python.')
+    await m.rate('Weak and wrong about python.', 'bad')
+    for (let i = 0; i < 5; i++) await m.add(`filler ${i}`, 'x')
+
+    expect(await m.recall('tell me about python')).not.toContain('Weak and wrong')
+  })
+
+  it('tells the model which answers were approved', async () => {
+    const m = new MemoryStore(path, fakeEmbedder)
+    await m.add('my python skills', 'Strong in python and pandas.')
+    await m.rate('Strong in python and pandas.', 'good')
+    for (let i = 0; i < 5; i++) await m.add(`filler ${i}`, 'x')
+
+    const recalled = await m.recall('tell me about python')
+    expect(recalled).toContain('pandas')
+    expect(recalled).toContain('marked this answer good')
+  })
+})

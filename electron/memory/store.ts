@@ -9,6 +9,12 @@ export interface Exchange {
   answer: string
   /** Optional user correction attached later, e.g. "no, say X instead". */
   note?: string
+  /**
+   * What the user made of the answer. This is not a statistic: a rejected answer
+   * is excluded from recall so it cannot be reused, and an approved one is
+   * preferred, which is the only reason to ask.
+   */
+  rating?: 'good' | 'bad'
 }
 
 interface RememberedExchange extends Exchange {
@@ -80,7 +86,7 @@ export class MemoryStore {
     return this.items
       .filter((i) => !looksLikeScreenDescription(i.answer))
       .slice(-n)
-      .map(({ ts, question, answer, note }) => ({ ts, question, answer, note }))
+      .map(({ ts, question, answer, note, rating }) => ({ ts, question, answer, note, rating }))
   }
 
   /**
@@ -123,14 +129,24 @@ export class MemoryStore {
     }
 
     const ranked = scorable
-      .map((i) => ({ item: i, score: cosineSimilarity(queryVec, i.vector!) }))
+      // An answer the user rejected must never come back as an example to reuse.
+      .filter((i) => i.rating !== 'bad')
+      .map((i) => ({
+        item: i,
+        // An approved answer is worth surfacing slightly sooner than an unrated
+        // one of similar relevance.
+        score: cosineSimilarity(queryVec, i.vector!) + (i.rating === 'good' ? 0.08 : 0),
+      }))
       .sort((a, b) => b.score - a.score)
       .filter((r) => r.score > 0.5) // only genuinely related past turns
 
     const picked: string[] = []
     let used = 0
     for (const { item } of ranked) {
-      const entry = `Q: ${item.question}\nA: ${item.answer}${item.note ? `\nCorrection: ${item.note}` : ''}`
+      const entry =
+        `Q: ${item.question}\nA: ${item.answer}` +
+        (item.rating === 'good' ? '\n(the user marked this answer good)' : '') +
+        (item.note ? `\nCorrection: ${item.note}` : '')
       const tokens = Math.ceil(entry.length / 4)
       if (used + tokens > this.recallBudgetTokens) continue
       picked.push(entry)
@@ -140,6 +156,29 @@ export class MemoryStore {
     return picked.length
       ? `Relevant things from earlier sessions (reuse what fits, the user liked these):\n\n${picked.join('\n\n')}`
       : ''
+  }
+
+  /**
+   * Records what the user thought of an answer, matched on its text since that is
+   * what the interface has to hand.
+   */
+  async rate(answer: string, rating: 'good' | 'bad' | null): Promise<boolean> {
+    const target = answer.trim()
+    // Search backwards: the answer being rated is nearly always a recent one.
+    for (let i = this.items.length - 1; i >= 0; i--) {
+      if (this.items[i].answer.trim() !== target) continue
+      if (rating) this.items[i].rating = rating
+      else delete this.items[i].rating
+      await this.rewrite()
+      return true
+    }
+    return false
+  }
+
+  /** Persists the whole file, used when an existing entry changes. */
+  private async rewrite(): Promise<void> {
+    await mkdir(dirname(this.path), { recursive: true })
+    await writeFile(this.path, this.items.map((i) => JSON.stringify(i)).join('\n') + '\n', 'utf8')
   }
 
   /** Wipes all learned history, on disk and in memory. */
