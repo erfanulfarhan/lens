@@ -12,7 +12,7 @@ computer. If you already own an API key, it uses that instead.
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/05-workspace.png" width="860" alt="Lens answering a question with the searchable chat history sidebar open; the LOCAL badge shows the model ran on this machine"/>
+  <img src="docs/screenshots/05-workspace.png" width="900" alt="Lens answering three questions with the searchable chat history sidebar open; a LOCAL badge on each answer shows the model ran on this machine"/>
 </p>
 
 <p align="center">

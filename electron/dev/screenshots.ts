@@ -57,6 +57,23 @@ export async function captureScreenshots(panel: BrowserWindow, outDir: string): 
   await wait(22000)
   await shot('02-answer')
 
+  // The history shot is only worth taking if there is history to show, and a
+  // screenshot run starts from whatever profile it is given. Asking a few more
+  // real questions fills the sidebar with genuine exchanges, so the capture
+  // never depends on the operator's own past conversations.
+  for (const q of [
+    'Summarise the key risks in a software licence agreement',
+    'Draft a short reply declining a meeting politely',
+    'Explain what a bandwidth-delay product is',
+  ]) {
+    // A new session per question, otherwise every answer appends to the same
+    // conversation and the sidebar ends up with a single entry.
+    await panel.webContents.executeJavaScript(`window.lens.newSession()`)
+    await wait(600)
+    await panel.webContents.executeJavaScript(`window.lens.ask(${JSON.stringify(q)})`)
+    await wait(20000)
+  }
+
   await click('button[title="Chat history"]')
   await wait(900)
   await shot('03-history', 1360, 720)  // wider and taller: it holds the sidebar too

@@ -82,9 +82,9 @@ export default function App() {
           <div className="shot-rise mt-20 mb-4">
             <Shot
               src="/shot-workspace.png"
-              alt="Lens answering a question with the searchable chat history sidebar open; the LOCAL badge shows the model ran on this machine"
-              width={1424}
-              height={700}
+              alt="Lens answering three questions with the searchable chat history sidebar open; a LOCAL badge on each answer shows the model ran on this machine"
+              width={2720}
+              height={1440}
               priority
               caption={
                 <>
@@ -171,18 +171,20 @@ export default function App() {
             ))}
           </ol>
 
-          <div className="mt-24 grid gap-10 sm:grid-cols-2 sm:gap-7">
+          <div className="mt-24 flex flex-col gap-20">
             <Shot
               src="/shot-answer.png"
               alt="The Lens panel answering a question, showing the model in use and the local status badge"
               width={2240}
               height={600}
+              caption="One question, one answer, and the badge that says where it ran."
             />
             <Shot
               src="/shot-settings.png"
               alt="Settings: choosing a provider, adding an API key and viewing keyboard shortcuts"
               width={1800}
               height={900}
+              caption="Pick a local model, or paste a key for a provider you already pay for."
             />
           </div>
         </Section>
