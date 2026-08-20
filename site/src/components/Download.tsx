@@ -3,11 +3,13 @@ import { OsIcon } from './OsIcon';
 import { fetchBuilds, FALLBACK, type Build } from '../lib/releases';
 
 /**
- * Direct downloads, one per platform.
+ * Every platform, one treatment.
  *
- * Sending everyone to the releases page made them read nine filenames and guess
- * which was theirs. The visitor's own platform leads; the others stay visible
- * because people download for a machine they are not sitting at.
+ * An earlier version promoted the detected platform to a filled brass button and
+ * left the rest outlined. That invented a hierarchy the product does not have —
+ * these are six equal builds of the same app — and on any given machine the
+ * highlight looked arbitrary. Detection now only affects order, which helps
+ * without claiming one download matters more.
  */
 function detectOs(): Build['os'] | null {
   if (typeof navigator === 'undefined') return null;
@@ -30,83 +32,58 @@ export function Download({ compact = false }: { compact?: boolean }) {
     };
   }, []);
 
-  // Ordered so the visitor's platform is first.
   const ordered = builds
     ? [...builds].sort((a, b) => Number(b.os === mine) - Number(a.os === mine))
     : null;
-  const primary = ordered?.[0];
-  const rest = ordered?.slice(1) ?? [];
 
-  // Until the release resolves, and if it never does, the releases page always works.
-  if (!primary) {
+  if (!ordered || ordered.length === 0) {
     return (
       <a
         href={FALLBACK}
-        className="pressable inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-[14px] font-medium"
-        style={{
-          background: 'linear-gradient(135deg, var(--brass-lit), var(--brass) 55%, var(--brass-dim))',
-          color: '#17130c',
-          boxShadow: '0 14px 40px -14px rgba(200,150,79,0.6)',
-        }}
+        className="pressable inline-flex items-center gap-2.5 rounded-xl border border-[var(--line)] px-6 py-3.5 text-[14px] text-[var(--paper)] hover:border-[var(--brass-dim)]"
+        style={{ background: 'var(--panel)' }}
       >
         Download Lens
       </a>
     );
   }
 
+  const shown = compact ? ordered.slice(0, 3) : ordered;
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2.5">
-        <a
-          href={primary.url}
-          className="pressable inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-[14px] font-semibold"
-          style={{
-            background: 'linear-gradient(135deg, var(--brass-lit), var(--brass) 55%, var(--brass-dim))',
-            color: '#17130c',
-            boxShadow: '0 14px 40px -14px rgba(200,150,79,0.6)',
-          }}
-        >
-          <OsIcon os={primary.os} size={19} />
-          <span>
-            Download for {primary.label}
-            <span className="ml-1.5 font-normal opacity-70">
-              {primary.detail}
-              {primary.sizeMb ? ` · ${primary.sizeMb}MB` : ''}
-            </span>
-          </span>
-        </a>
-
-        {!compact &&
-          rest.slice(0, 2).map((b) => (
-            <a
-              key={b.url}
-              href={b.url}
-              title={`${b.label} — ${b.detail}`}
-              className="pressable inline-flex items-center gap-2.5 rounded-full border border-[var(--line)] px-5 py-3.5 text-[13.5px] text-[var(--muted)] hover:border-[var(--brass-dim)] hover:text-[var(--paper)]"
+      <div className="flex flex-wrap gap-2.5">
+        {shown.map((b) => (
+          <a
+            key={b.url}
+            href={b.url}
+            className="pressable group flex items-center gap-3 rounded-xl border border-[var(--line)] px-5 py-3 transition-colors duration-150 hover:border-[var(--brass-dim)]"
+            style={{ background: 'var(--panel)' }}
+          >
+            <span
+              className="shrink-0 transition-colors duration-150"
+              style={{ color: 'var(--brass)' }}
             >
-              <OsIcon os={b.os} size={18} />
-              {b.label}
-            </a>
-          ))}
-      </div>
-
-      {!compact && rest.length > 2 && (
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] text-[var(--faint)]">
-          <span>Also:</span>
-          {rest.slice(2).map((b) => (
-            <a key={b.url} href={b.url} className="underline decoration-[var(--line)] hover:text-[var(--paper)]">
-              {b.label} {b.detail}
-            </a>
-          ))}
-          <a href={FALLBACK} className="underline decoration-[var(--line)] hover:text-[var(--paper)]">
-            All builds
+              <OsIcon os={b.os} size={20} />
+            </span>
+            <span className="flex flex-col leading-tight">
+              <span className="text-[13.5px] font-semibold text-[var(--paper)]">{b.label}</span>
+              <span className="text-[11.5px] text-[var(--faint)]">
+                {b.detail}
+                {b.sizeMb ? ` · ${b.sizeMb}MB` : ''}
+              </span>
+            </span>
           </a>
-        </div>
-      )}
+        ))}
+      </div>
 
       {!compact && (
         <p className="text-[13px] leading-relaxed text-[var(--faint)]">
-          Free, no account. Not code-signed yet, so your machine will ask once.
+          Free, no account.{' '}
+          <a href={FALLBACK} className="underline decoration-[var(--line)] hover:text-[var(--paper)]">
+            All builds and checksums
+          </a>
+          . Not code-signed yet, so your machine will ask once.
         </p>
       )}
     </div>
