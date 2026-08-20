@@ -8,13 +8,17 @@ on, and answers using documents you give it. The model can run locally through
 computer. If you already own an API key, it uses that instead.
 
 <p align="center">
-  <img src="docs/screenshots/03-history.png" width="820" alt="Lens answering a question, with the chat history sidebar open"/>
+  <a href="https://getlens.pages.dev"><strong>getlens.pages.dev</strong></a>
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/04-settings.png" width="420" alt="Settings: choose a provider, add an API key, view shortcuts"/>
+  <img src="docs/screenshots/05-workspace.png" width="860" alt="Lens answering a question with the searchable chat history sidebar open; the LOCAL badge shows the model ran on this machine"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/06-answer.png" width="424" alt="The Lens panel answering a question about an open source project"/>
   &nbsp;
-  <img src="docs/screenshots/01-empty.png" width="420" alt="The Lens panel, ready for a question"/>
+  <img src="docs/screenshots/07-settings.png" width="424" alt="Settings: choose a provider, add an API key, view shortcuts"/>
 </p>
 
 ## Why

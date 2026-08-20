@@ -3,15 +3,96 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lens — a screen-aware AI assistant that runs on your machine</title>
-    <meta name="description" content="Ask about anything on your screen, in your calls, or in your own documents. The model runs on your computer through Ollama, so there is no subscription and nothing is uploaded. Free for macOS, Windows and Linux." />
+    <title>Lens — Free Local AI Screen Assistant for macOS, Windows and Linux</title>
+    <meta name="description" content="A free AI assistant that reads your screen, follows your calls and answers from your own documents. The model runs on your own computer through Ollama, so there is no subscription and nothing is uploaded." />
     <link rel="icon" href="/mark.svg" />
+    <link rel="canonical" href="https://getlens.pages.dev/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#0F1116" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lens" />
+    <meta property="og:title" content="Lens — a free local AI screen assistant" />
+    <meta property="og:description" content="Reads your screen, follows your calls, answers from your own documents. Runs on your machine, so there is no subscription and nothing is uploaded." />
+    <meta property="og:url" content="https://getlens.pages.dev/" />
+    <meta property="og:image" content="https://getlens.pages.dev/social.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lens — a free local AI screen assistant" />
+    <meta name="twitter:description" content="Runs on your own machine. No subscription, nothing uploaded." />
+    <meta name="twitter:image" content="https://getlens.pages.dev/social.png" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Lens",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "macOS, Windows, Linux",
+      "url": "https://getlens.pages.dev/",
+      "downloadUrl": "https://github.com/erfanulfarhan/lens/releases",
+      "softwareVersion": "0.1.3",
+      "description": "A screen and audio aware AI assistant that runs on your own machine. The model runs locally through Ollama, so there is no subscription and nothing leaves your computer.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": [
+        "Answers questions about what is on your screen",
+        "On-device call transcription (macOS)",
+        "Retrieval over your own PDFs, notes and documents",
+        "Cross-session chat history and memory",
+        "Optional web search, off by default",
+        "Recommends a model that fits your hardware"
+      ]
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Schibsted+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Crawlable fallback, replaced by the app on mount. Without it a crawler
+           that does not execute JavaScript sees an empty div. -->
+      <article style="max-width:44rem;margin:0 auto;padding:3rem 1.25rem;font-family:system-ui,sans-serif;color:#E8E6E1;background:#0F1116">
+        <h1>Lens — a free AI assistant that runs on your own machine</h1>
+        <p>
+          Lens reads your screen when you ask it to, follows what was just said on a call, and
+          answers from documents you give it. The model runs on your own computer through Ollama,
+          so there is no subscription, no account, and nothing is uploaded.
+        </p>
+        <p>
+          Assistants of this kind are usually rented: a monthly fee, your screen processed on
+          someone else's servers, and a model you cannot choose. Lens is the same idea built the
+          other way round. You host the model, you pick it, and the data stays with you.
+        </p>
+        <h2>What it does</h2>
+        <ul>
+          <li><strong>Answers about your screen.</strong> Press ⌘⇧Space and it asks what you want done with the capture instead of guessing.</li>
+          <li><strong>Follows conversations.</strong> With listening on, it transcribes the call on-device and can answer the last thing the other person said. macOS only.</li>
+          <li><strong>Knows your material.</strong> Drop in PDFs, Word files, notes or markdown and it retrieves only the relevant passages per question, so a large library still fits a small model's context.</li>
+          <li><strong>Remembers across sessions.</strong> Chats are kept in a searchable sidebar and it recalls relevant past exchanges.</li>
+          <li><strong>Searches the web</strong> when you want it to, off by default.</li>
+          <li><strong>Recommends a model for your hardware,</strong> reading your RAM and VRAM so you do not find out the hard way.</li>
+        </ul>
+        <h2>Download</h2>
+        <p>
+          Free for macOS on Apple Silicon and Intel, Windows, and Linux as an AppImage, deb or rpm.
+          The installers are not code-signed yet, so macOS needs right-click then Open, and Windows
+          needs More info then Run anyway.
+        </p>
+        <h2>Does it hide from screen sharing?</h2>
+        <p>
+          No, and that is deliberate. Lens has no anti-detection of any kind and none is planned.
+          It is built to be a tool you use openly, not one you conceal during an interview or exam.
+        </p>
+        <h2>What leaves your computer</h2>
+        <p>
+          Two things, and only when you choose them: a cloud provider if you pick one instead of
+          running locally, and web search when you switch it on. Documents, chat history and
+          learned memory stay in your user data directory. API keys are encrypted with the OS
+          keychain, and transcription runs on-device.
+        </p>
+        <p>Enable JavaScript to use the download buttons.</p>
+      </article>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -84,15 +84,17 @@ export default function App() {
               style={{ boxShadow: '0 40px 90px -40px rgba(0,0,0,0.9)' }}
             >
               <img
-                src="/shot-answer.png"
-                alt="The Lens panel answering a question about what is on screen"
+                src="/shot-workspace.png"
+                alt="Lens answering a question, with the searchable chat history sidebar open and a LOCAL badge showing the model ran on this machine"
                 className="block w-full"
+                width={1424}
+                height={700}
                 loading="eager"
               />
             </div>
             <figcaption className="mt-4 text-[13px] text-[var(--faint)]">
-              Answering from a screen capture, with a local model. Nothing in this exchange left the
-              machine.
+              A real answer from a local model. The <span className="mono text-[11px]">LOCAL</span>{' '}
+              badge is the app reporting that nothing in this exchange left the machine.
             </figcaption>
           </figure>
         </section>
@@ -174,8 +176,8 @@ export default function App() {
           <figure className="mt-20">
             <div className="grid gap-5 sm:grid-cols-2">
               {[
-                { src: '/shot-history.png', alt: 'Chat history sidebar, with past conversations searchable' },
-                { src: '/shot-settings.png', alt: 'Settings: choosing a provider and viewing shortcuts' },
+                { src: '/shot-answer.png', alt: 'The Lens panel answering a question, showing the model in use and the local status badge' },
+                { src: '/shot-settings.png', alt: 'Settings: choosing a provider, adding an API key and viewing keyboard shortcuts' },
               ].map((s) => (
                 <img
                   key={s.src}
