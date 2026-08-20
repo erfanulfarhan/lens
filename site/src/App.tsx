@@ -175,14 +175,14 @@ export default function App() {
             <Shot
               src="/shot-answer.png"
               alt="The Lens panel answering a question, showing the model in use and the local status badge"
-              width={960}
-              height={720}
+              width={2240}
+              height={600}
             />
             <Shot
               src="/shot-settings.png"
               alt="Settings: choosing a provider, adding an API key and viewing keyboard shortcuts"
-              width={960}
-              height={760}
+              width={1800}
+              height={900}
             />
           </div>
         </Section>
