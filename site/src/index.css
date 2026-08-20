@@ -1,0 +1,106 @@
+@import 'tailwindcss';
+
+/* Palette lifted from the app's own src/index.css, not invented for the page. */
+:root {
+  --ink: #0f1116;
+  --panel: #161920;
+  --raise: #1d212a;
+  --line: #252a34;
+
+  --brass: #c8964f;
+  --brass-lit: #ebc689;
+  --brass-dim: #8a6836;
+  --sage: #7fa88b;
+
+  --paper: #e8e6e1;
+  /* Warm-tinted, never a neutral gray: the ground is warm and gray text on it
+     reads dead. */
+  --muted: #9a9da6;
+  /* 5.13:1 on the ground. The previous #6b6e78 measured 3.71 and failed the
+     4.5 floor for the small print it is used on: captions, asides, footer. */
+  --faint: #82858f;
+
+  /* Bodoni Moda: a Didone, so it carries the same machined high-contrast
+     precision as the brass barrel. Used only at large sizes, where its
+     hairlines survive; anything small takes the body face instead. */
+  --display: 'Bodoni Moda', 'Didot', Georgia, serif;
+  /* Schibsted Grotesk: calm and slightly humanist, so it recedes under the
+     Didone instead of competing with it. */
+  --body: 'Schibsted Grotesk', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* The browser surfaces we did not draw still carry the design. */
+::selection { background: color-mix(in srgb, var(--brass) 34%, transparent); color: #fff; }
+:root { accent-color: var(--brass); caret-color: var(--brass); }
+::-webkit-scrollbar { width: 11px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 3px solid var(--ink); }
+::-webkit-scrollbar-thumb:hover { background: var(--brass-dim); }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; border-radius: 3px; }
+a { color: inherit; text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+
+.display {
+  font-family: var(--display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.022em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.measure { max-width: 68ch; }
+
+/* Hairline that fades, so section joins do not look like table borders. */
+.rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 18%, var(--line) 82%, transparent);
+}
+
+/* --- the one authored moment: the aperture opens ---------------------------
+   Blades rotate apart, sage light spills through, and the hero resolves behind
+   it. Everything afterwards is quiet on purpose. */
+/* The iris opens: the hole grows and settles, and the metal appears to retract
+   without any blade needing to move. */
+@keyframes iris-open {
+  from { transform: rotate(-32deg) scale(0.04); }
+  to   { transform: rotate(0deg) scale(0.5); }
+}
+@keyframes iris-seams {
+  from { transform: rotate(-32deg); opacity: 0; }
+  to   { transform: rotate(0deg); opacity: 1; }
+}
+@keyframes hero-resolve {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); filter: blur(14px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes shot-rise {
+  from { opacity: 0; transform: translate3d(0, 40px, 0) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+.iris-open { animation: iris-open 1600ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.iris-seams { animation: iris-seams 1600ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero-resolve { animation: hero-resolve 1200ms cubic-bezier(0.16, 1, 0.3, 1) 620ms both; }
+.shot-rise { animation: shot-rise 1100ms cubic-bezier(0.16, 1, 0.3, 1) 900ms both; }
+
+/* A supported mode: the open state is served immediately, nothing is hidden. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
