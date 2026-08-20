@@ -1,5 +1,6 @@
 import { Aperture } from './components/Aperture';
 import { Download } from './components/Download';
+import { Shot } from './components/Shot';
 import { Faq } from './components/Faq';
 import { LEDGER, REPO, STEPS, VERSION } from './content';
 
@@ -78,25 +79,22 @@ export default function App() {
           </div>
 
           {/* Real product screenshot, not a mockup. */}
-          <figure className="shot-rise mt-20 mb-4">
-            <div
-              className="overflow-hidden rounded-xl border border-[var(--line)]"
-              style={{ boxShadow: '0 40px 90px -40px rgba(0,0,0,0.9)' }}
-            >
-              <img
-                src="/shot-workspace.png"
-                alt="Lens answering a question, with the searchable chat history sidebar open and a LOCAL badge showing the model ran on this machine"
-                className="block w-full"
-                width={1424}
-                height={700}
-                loading="eager"
-              />
-            </div>
-            <figcaption className="mt-4 text-[13px] text-[var(--faint)]">
-              A real answer from a local model. The <span className="mono text-[11px]">LOCAL</span>{' '}
-              badge is the app reporting that nothing in this exchange left the machine.
-            </figcaption>
-          </figure>
+          <div className="shot-rise mt-20 mb-4">
+            <Shot
+              src="/shot-workspace.png"
+              alt="Lens answering a question with the searchable chat history sidebar open; the LOCAL badge shows the model ran on this machine"
+              width={1424}
+              height={700}
+              priority
+              caption={
+                <>
+                  A real answer from a local model. The{' '}
+                  <span className="mono text-[11px]">LOCAL</span> badge is the app reporting that
+                  nothing in this exchange left the machine.
+                </>
+              }
+            />
+          </div>
         </section>
 
         <div className="rule mx-auto mt-24 max-w-[1080px]" />
@@ -173,23 +171,20 @@ export default function App() {
             ))}
           </ol>
 
-          <figure className="mt-20">
-            <div className="grid gap-5 sm:grid-cols-2">
-              {[
-                { src: '/shot-answer.png', alt: 'The Lens panel answering a question, showing the model in use and the local status badge' },
-                { src: '/shot-settings.png', alt: 'Settings: choosing a provider, adding an API key and viewing keyboard shortcuts' },
-              ].map((s) => (
-                <img
-                  key={s.src}
-                  src={s.src}
-                  alt={s.alt}
-                  loading="lazy"
-                  className="block w-full rounded-xl border border-[var(--line)]"
-                  style={{ boxShadow: '0 28px 60px -34px rgba(0,0,0,0.85)' }}
-                />
-              ))}
-            </div>
-          </figure>
+          <div className="mt-24 grid gap-10 sm:grid-cols-2 sm:gap-7">
+            <Shot
+              src="/shot-answer.png"
+              alt="The Lens panel answering a question, showing the model in use and the local status badge"
+              width={960}
+              height={720}
+            />
+            <Shot
+              src="/shot-settings.png"
+              alt="Settings: choosing a provider, adding an API key and viewing keyboard shortcuts"
+              width={960}
+              height={760}
+            />
+          </div>
         </Section>
 
         {/* ------------------------------------------------------------ price */}

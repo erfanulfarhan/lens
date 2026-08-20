@@ -69,3 +69,15 @@ Reduced motion serves the open state immediately.
 - Numbers appear only in "how it works", where the sequence is real.
 - No gradient text, no glass as decoration.
 - Browser surfaces themed: selection, caret, scrollbar, focus ring.
+
+## Screenshot presentation
+
+Shots are framed as windows floating on the page: three stacked shadows
+(contact, mid-lift, long fall), a hairline rim brighter along the top edge, and
+a brass bloom sitting behind the glass. One shadow always looks pasted on.
+
+Deliberately **no macOS traffic lights**. The reference this was modelled on had
+real ones, captured from a browser. The Lens panel is frameless and carries its
+own controls on the right, so drawing Apple's on the left would show a window
+chrome the app does not have. The framing is presentation; the pixels inside are
+exactly as captured, cropped only to remove empty panel.
