@@ -28,6 +28,7 @@ import { providerFromSettings, type ProviderId } from './providers/index.js'
 import { recommendModels } from './hardware/recommend.js'
 import { Dispatcher, type TriggerSource } from './triggers/dispatcher.js'
 import { questionNeedsScreen } from './screen-relevance.js'
+import { isUniformBitmap } from './capture/blank-frame.js'
 
 // Keys live in .env next to the project so the app works when launched from
 // Finder, where a shell profile's exports are not available.
@@ -117,12 +118,61 @@ function createPanel(): BrowserWindow {
   return win
 }
 
+/** Why a capture failed, so the interface can say something true about it. */
+type CaptureFailure =
+  | 'not-determined'
+  | 'denied'
+  | 'stale-grant'
+  | 'no-source'
+  | 'error'
+
+type CaptureResult = { ok: true; base64: string } | { ok: false; reason: CaptureFailure }
+
+/**
+ * macOS reports Screen Recording as granted, denied, restricted or
+ * not-determined. Only macOS has the concept; elsewhere treat it as granted.
+ */
+type ScreenAccess = 'granted' | 'denied' | 'restricted' | 'not-determined' | 'unknown'
+
+function screenAccess(): ScreenAccess {
+  if (process.platform !== 'darwin') return 'granted'
+  return systemPreferences.getMediaAccessStatus('screen')
+}
+
+/**
+ * True when every pixel is the same colour.
+ *
+ * This is the failure mode that matters, and the one the old code missed. When
+ * macOS refuses a capture it does not throw and it does not return an empty
+ * image: it returns a correctly sized, entirely black frame. `isEmpty()` is
+ * false for that, so a refused capture used to sail through and reach the model
+ * as a black rectangle.
+ *
+ * Downsampled first: comparing 64 pixels answers the question as well as
+ * comparing several million, and costs nothing.
+ */
+function isUniform(image: Electron.NativeImage): boolean {
+  const small = image.resize({ width: 8, height: 8, quality: 'good' })
+  return isUniformBitmap(small.toBitmap())
+}
+
 /**
  * Full grab for the model. The panel is hidden first: it floats above
  * everything, so otherwise the model receives a screenshot of its own UI
  * covering the thing it was asked about.
  */
-async function captureScreen(): Promise<string | undefined> {
+async function captureScreen(): Promise<CaptureResult> {
+  const access = screenAccess()
+  if (access === 'not-determined') {
+    // Asking triggers the system prompt. The answer arrives after this call, so
+    // the caller tells the user to try again rather than reporting a refusal.
+    void desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 1, height: 1 } })
+    return { ok: false, reason: 'not-determined' }
+  }
+  if (access === 'denied' || access === 'restricted') return { ok: false, reason: 'denied' }
+  // 'unknown' falls through on purpose: attempt the grab and let the frame
+  // itself answer, rather than refusing on an inconclusive status.
+
   const wasVisible = panel?.isVisible() ?? false
   if (wasVisible) panel?.hide()
 
@@ -136,11 +186,44 @@ async function captureScreen(): Promise<string | undefined> {
       },
     })
     const shot = sources[0]?.thumbnail
-    if (!shot || shot.isEmpty()) return undefined
-    return shot.resize({ width: provider.maxImageWidth }).toPNG().toString('base64')
+    if (!shot || shot.isEmpty()) return { ok: false, reason: 'no-source' }
+
+    // Permission says granted, yet the frame carries nothing. This is what an
+    // ad-hoc signed build looks like after it is rebuilt: the entry still shows
+    // enabled in System Settings, but it was bound to the previous build's code
+    // signature, so the running app is a stranger to it.
+    if (isUniform(shot)) return { ok: false, reason: 'stale-grant' }
+
+    return {
+      ok: true,
+      base64: shot.resize({ width: provider.maxImageWidth }).toPNG().toString('base64'),
+    }
+  } catch (err) {
+    console.error('[lens] screen capture failed:', err)
+    return { ok: false, reason: 'error' }
   } finally {
     if (wasVisible) panel?.showInactive()
   }
+}
+
+/** Opens the exact pane, so nobody has to go hunting through System Settings. */
+function openScreenRecordingSettings(): void {
+  if (process.platform !== 'darwin') return
+  void shell.openExternal(
+    'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture'
+  )
+}
+
+const CAPTURE_MESSAGE: Record<CaptureFailure, string> = {
+  'not-determined':
+    'macOS is asking whether Lens may record the screen. Allow it, then press the shortcut again.',
+  denied:
+    'Screen Recording is turned off for Lens. Open System Settings to allow it, then press the shortcut again.',
+  // The case that sends people in circles: the toggle is already on.
+  'stale-grant':
+    'macOS returned a blank screen even though Screen Recording looks enabled. This happens after Lens is updated, because the permission was tied to the previous build. Remove Lens from Screen Recording in System Settings, add it again, then restart Lens.',
+  'no-source': 'macOS offered no screen to capture. If you use multiple displays, try again.',
+  error: 'The screen capture failed unexpectedly. The details are in the log.',
 }
 
 
@@ -191,7 +274,14 @@ async function ask(source: TriggerSource, question: string): Promise<void> {
       base64 = pendingScreenshot
       pendingScreenshot = null
     } else if (source === 'hotkey' || questionNeedsScreen(question)) {
-      base64 = await captureScreen()
+      const shot = await captureScreen()
+      if (shot.ok) {
+        base64 = shot.base64
+      } else {
+        // The question still gets answered without the screen; the reason is
+        // surfaced so a black frame is never quietly sent to the model.
+        send('lens:error', CAPTURE_MESSAGE[shot.reason])
+      }
     }
 
     // Built per question: retrieval selects doc excerpts relevant to THIS
@@ -308,12 +398,20 @@ async function usableModels(): Promise<string[]> {
  * until the user says what they want done with it.
  */
 async function captureForCommand(): Promise<void> {
-  const base64 = await captureScreen().catch(() => undefined)
-  if (!base64) {
-    send('lens:error', 'Could not capture the screen. Check Screen Recording permission in System Settings.')
+  // Deliberately not `.catch(() => undefined)`. Swallowing the error was half
+  // the bug: it threw away the only evidence of what actually went wrong and
+  // left one message to cover every cause.
+  const result = await captureScreen()
+  if (!result.ok) {
+    send('lens:error', CAPTURE_MESSAGE[result.reason])
+    // A wrong or stale permission is fixed in one place; offer to open it.
+    if (result.reason === 'denied' || result.reason === 'stale-grant') {
+      send('lens:error-action', { label: 'Open Screen Recording settings', action: 'screen-settings' })
+    }
+    if (!panel?.isVisible()) panel?.show()
     return
   }
-  pendingScreenshot = base64
+  pendingScreenshot = result.base64
   if (!panel?.isVisible()) panel?.show()
   panel?.focus()
   send('lens:screen-attached')
@@ -511,6 +609,8 @@ app.whenReady().then(async () => {
   })
 
   ipcMain.handle('lens:open-knowledge', () => shell.openPath(KNOWLEDGE_DIR))
+  ipcMain.handle('lens:open-screen-settings', () => openScreenRecordingSettings())
+  ipcMain.handle('lens:screen-access', () => screenAccess())
   ipcMain.handle('lens:set-web', (_e, on: boolean) => {
     webEnabled = on
     pushStatus()

@@ -55,6 +55,8 @@ contextBridge.exposeInMainWorld('lens', {
   getAboutMe: () => ipcRenderer.invoke('lens:get-about-me'),
   setSidebar: (open: boolean) => ipcRenderer.invoke('lens:set-sidebar', open),
   captureScreen: () => ipcRenderer.invoke('lens:capture-screen'),
+  openScreenSettings: () => ipcRenderer.invoke('lens:open-screen-settings'),
+  screenAccess: () => ipcRenderer.invoke('lens:screen-access'),
   discardScreen: () => ipcRenderer.invoke('lens:discard-screen'),
   setListening: (on: boolean) => ipcRenderer.invoke('lens:set-listening', on),
   setAutoAnswer: (on: boolean) => ipcRenderer.invoke('lens:set-auto-answer', on),

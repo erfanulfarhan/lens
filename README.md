@@ -72,6 +72,23 @@ The installers are not code-signed yet. On macOS, right-click the app and choose
 **Open** the first time. On Windows, choose **More info → Run anyway**. Linux needs
 nothing special.
 
+### Screen Recording permission keeps being asked for
+
+The builds are ad-hoc signed, with no Developer ID. macOS ties a Screen
+Recording grant to the app's code signature, and an ad-hoc signature changes
+every time the app is rebuilt — so after an update macOS sees a different
+application, the old grant no longer applies, and the toggle in System Settings
+stays on while pointing at a build that no longer exists.
+
+When that happens, remove Lens from **System Settings → Privacy & Security →
+Screen & System Audio Recording**, add it again, and restart Lens. Keeping a
+single copy of the app helps too: two bundles sharing one bundle identifier
+(say `/Applications/Lens.app` and a `dist/` build) make the entry ambiguous.
+
+Lens now detects this case specifically and says so, rather than telling you to
+check a permission that is already enabled. A proper fix needs a Developer ID
+signature.
+
 Listening to calls is macOS only: it uses a small Swift helper built against
 ScreenCaptureKit, which has no equivalent on other platforms. Everything else works
 everywhere.
