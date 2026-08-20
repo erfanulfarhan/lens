@@ -2,15 +2,36 @@
 
 /* Palette lifted from the app's own src/index.css, not invented for the page. */
 :root {
-  --ink: #0f1116;
+  --ink: #0a0c11;
   --panel: #161920;
   --raise: #1d212a;
   --line: #252a34;
 
-  --brass: #c8964f;
-  --brass-lit: #ebc689;
-  --brass-dim: #8a6836;
-  --sage: #7fa88b;
+  /* A lens disperses white light into a spectrum, so the page is not one colour
+     with an accent: it is a spectrum, and each section owns one wavelength in
+     true spectral order. Amber is the app's brass, evolved — it becomes one
+     wavelength rather than the whole page. */
+  --violet: #8b5cf6;
+  --azure: #38bdf8;
+  --jade: #34d399;
+  --amber: #f5a524;
+  --rose: #fb7185;
+
+  /* The mark keeps these whatever band it sits in: it is the product's face,
+     printed on the installers and the favicon. */
+  --amber-fixed: #f5a524;
+  --amber-lit-fixed: #ebc689;
+  --jade-fixed: #34d399;
+
+  /* The live wavelength, set per band as the page scrolls. */
+  --accent: var(--amber);
+  --accent-lit: #ffd08a;
+
+  /* Kept so existing rules keep working while the page moves to the spectrum. */
+  --brass: var(--accent);
+  --brass-lit: var(--accent-lit);
+  --brass-dim: color-mix(in srgb, var(--accent) 55%, #000);
+  --sage: var(--jade);
 
   --paper: #e8e6e1;
   /* Warm-tinted, never a neutral gray: the ground is warm and gray text on it
@@ -121,3 +142,158 @@ a { color: inherit; text-underline-offset: 0.22em; text-decoration-thickness: 1p
 a[href], button { -webkit-tap-highlight-color: transparent; }
 .pressable { transition: transform 140ms var(--ease-out); }
 .pressable:active { transform: scale(0.97); }
+
+/* ---- Dispersion ------------------------------------------------------------
+   Each band declares its wavelength; everything accent-coloured inside it
+   follows, so the whole page changes hue as you move down it. The transition is
+   slow on purpose: a fast hue change reads as a glitch, a slow one as light
+   bending. */
+/* Aliases are restated inside every band because a custom property that
+   references another is substituted where it is DEFINED. --brass computed on
+   :root stays amber however a descendant redefines --accent, which left step
+   numbers and rules orange inside a green section. */
+
+[data-band='violet'] {
+  --accent: var(--violet);
+  --accent-lit: #c4b5fd;
+  --brass: var(--violet);
+  --brass-lit: #c4b5fd;
+  --brass-dim: color-mix(in srgb, var(--violet) 55%, #000);
+}
+[data-band='azure'] {
+  --accent: var(--azure);
+  --accent-lit: #a5e8ff;
+  --brass: var(--azure);
+  --brass-lit: #a5e8ff;
+  --brass-dim: color-mix(in srgb, var(--azure) 55%, #000);
+}
+[data-band='jade'] {
+  --accent: var(--jade);
+  --accent-lit: #a7f3d0;
+  --brass: var(--jade);
+  --brass-lit: #a7f3d0;
+  --brass-dim: color-mix(in srgb, var(--jade) 55%, #000);
+}
+[data-band='amber'] {
+  --accent: var(--amber);
+  --accent-lit: #ffd08a;
+  --brass: var(--amber);
+  --brass-lit: #ffd08a;
+  --brass-dim: color-mix(in srgb, var(--amber) 55%, #000);
+}
+[data-band='rose'] {
+  --accent: var(--rose);
+  --accent-lit: #fecdd3;
+  --brass: var(--rose);
+  --brass-lit: #fecdd3;
+  --brass-dim: color-mix(in srgb, var(--rose) 55%, #000);
+}
+
+/* The wavelength has to be visible, not merely declared. Each band casts a soft
+   aura of its own colour behind the content, so scrolling the page walks through
+   the spectrum instead of staying a dark page with a coloured detail. Kept low
+   in opacity and enormous in radius: a tint on the ground, never a gradient
+   panel. */
+[data-band] { position: relative; }
+[data-band]::before {
+  content: '';
+  position: absolute;
+  /* No horizontal bleed: the aura used to extend 30% past each edge, which added
+     113px of sideways scroll on a phone. The gradient is widened instead, so it
+     still reads as light spilling across the section. */
+  inset: -14% 0 auto 0;
+  height: 78%;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    120% 62% at 26% 24%,
+    color-mix(in srgb, var(--accent) 24%, transparent) 0%,
+    transparent 68%
+  );
+  filter: blur(18px);
+}
+
+/* The rail: a fixed hairline showing where you are in the spectrum. It is the
+   page's one piece of chrome, and it earns its place by being the dispersion
+   made visible. */
+.rail {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  z-index: 40;
+  background: linear-gradient(
+    to bottom,
+    var(--violet) 0%,
+    var(--azure) 25%,
+    var(--jade) 50%,
+    var(--amber) 75%,
+    var(--rose) 100%
+  );
+  opacity: 0.22;
+}
+/* Accented type: one phrase per section carries the wavelength, so the colour is
+   attached to meaning rather than floating in the background. */
+.lit { color: var(--accent-lit); }
+
+.rail-thumb {
+  position: fixed;
+  left: 0;
+  width: 3px;
+  height: 88px;
+  z-index: 41;
+  background: var(--accent);
+  box-shadow: 0 0 18px 2px color-mix(in srgb, var(--accent) 60%, transparent);
+  transition: top 220ms linear, background 900ms var(--ease-out);
+}
+
+/* ---- Typed hero ----------------------------------------------------------- */
+.typed {
+  font-family: var(--mono);
+  color: var(--paper);
+}
+.typed-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: caret-blink 1s step-end infinite;
+}
+@keyframes caret-blink { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+
+/* The beam: white light entering the aperture and leaving as a spectrum. */
+.beam {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--paper));
+  animation: beam-in 1100ms var(--ease-out) both;
+}
+.prism-out {
+  height: 2px;
+  background: linear-gradient(90deg,
+    var(--violet), var(--azure), var(--jade), var(--amber), var(--rose), transparent);
+  animation: beam-in 1100ms 260ms var(--ease-out) both;
+}
+@keyframes beam-in { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+
+/* Cards take their section's wavelength on hover rather than a fixed colour. */
+.lift { transition: transform 260ms var(--ease-out), border-color 260ms, box-shadow 260ms; }
+.lift:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 22px 60px -20px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam, .prism-out { animation: none !important; transform: none; opacity: 1; }
+  .typed-caret { animation: none !important; opacity: 1; }
+  /* Accented type: one phrase per section carries the wavelength, so the colour is
+   attached to meaning rather than floating in the background. */
+.lit { color: var(--accent-lit); }
+
+.rail-thumb { transition: none !important; }
+  [data-band] { transition: none !important; }
+  .lift:hover { transform: none; }
+}

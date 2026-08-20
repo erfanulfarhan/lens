@@ -56,6 +56,19 @@ export const LEDGER: Array<{ fact: string; detail: string; local?: boolean }> = 
   },
 ];
 
+/**
+ * What people actually ask it, typed in the hero. Drawn from the app's own
+ * commands, so the page demonstrates the product rather than describing it.
+ */
+export const ASKED = [
+  'What does this error mean?',
+  'Summarise the contract on my screen',
+  'Draft a reply to this email',
+  'What did they just ask me?',
+  'Turn my notes into revision questions',
+  'Translate this',
+];
+
 export const STEPS = [
   {
     title: 'Install Ollama and pull a model',

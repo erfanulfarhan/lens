@@ -1,23 +1,34 @@
 import { Aperture } from './components/Aperture';
+import { Rail } from './components/Rail';
+import { Typed } from './components/Typed';
 import { Download } from './components/Download';
 import { Shot } from './components/Shot';
 import { Faq } from './components/Faq';
-import { LEDGER, REPO, STEPS, VERSION } from './content';
+import { ASKED, LEDGER, REPO, STEPS, VERSION } from './content';
 
 /** Section shell: consistent rhythm, more space above a heading than below it. */
+type Band = 'violet' | 'azure' | 'jade' | 'amber' | 'rose';
+
 function Section({
   id,
+  band,
   heading,
   lede,
   children,
 }: {
   id: string;
+  /** The wavelength this section owns. Order down the page follows the spectrum. */
+  band: Band;
   heading: string;
   lede?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="mx-auto w-full max-w-[1080px] px-6 pt-32 sm:pt-40">
+    <section
+      id={id}
+      data-band={band}
+      className="mx-auto w-full max-w-[1080px] px-6 pt-32 sm:pt-40"
+    >
       <h2 className="display max-w-[26ch] text-[2.1rem] font-extrabold sm:text-[2.9rem]">{heading}</h2>
       {lede && (
         <p className="measure mt-6 text-[16px] leading-[1.72] text-[var(--muted)]">{lede}</p>
@@ -30,6 +41,7 @@ function Section({
 export default function App() {
   return (
     <>
+      <Rail />
       <header className="mx-auto flex w-full max-w-[1080px] items-center justify-between px-6 py-7">
         <div className="flex items-center gap-3">
           <Aperture size={26} animate={false} id="ap-nav" />
@@ -44,17 +56,34 @@ export default function App() {
 
       {/* ---------------------------------------------------------------- hero */}
       <main>
-        <section className="mx-auto w-full max-w-[1080px] px-6 pt-16 pb-8 sm:pt-24">
+        <section
+          data-band="violet"
+          className="mx-auto w-full max-w-[1080px] px-6 pt-16 pb-8 sm:pt-24"
+        >
           {/* Two columns rather than an overlay. Absolutely positioning the mark
               behind the headline ran the type straight through the metal, which
               read as an accident rather than a composition. */}
           <div className="grid items-center gap-14 lg:grid-cols-[1fr_auto] lg:gap-16">
           <div className="hero-resolve">
             <h1 className="display max-w-[19ch] text-[clamp(2.5rem,6.4vw,4.9rem)] font-black">
-              It reads your screen. Your machine keeps it.
+              It reads your screen. <span className="lit">Your machine keeps it.</span>
             </h1>
 
-            <p className="measure mt-9 text-[17px] leading-[1.7] text-[var(--muted)] sm:text-[18px]">
+            {/* White light in, spectrum out: the reason the page changes colour. */}
+            <div className="mt-9 flex max-w-[34rem] items-center gap-1.5" aria-hidden>
+              <div className="beam w-1/3 origin-left" />
+              <Aperture size={18} animate={false} id="ap-prism" />
+              <div className="prism-out flex-1 origin-left" />
+            </div>
+
+            {/* A mock composer, typing what people really ask it. */}
+            <div className="mt-7 max-w-[34rem] rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3">
+              <p className="text-[15px] leading-[1.6] sm:text-[16px]">
+                <Typed lines={ASKED} />
+              </p>
+            </div>
+
+            <p className="measure mt-7 text-[17px] leading-[1.7] text-[var(--muted)] sm:text-[18px]">
               Ask about anything on screen, anything just said on a call, or anything in your own
               documents. The model runs on your computer, so there is no subscription and nothing is
               uploaded — the same idea as the assistants you rent, built the other way round.
@@ -102,6 +131,7 @@ export default function App() {
         {/* -------------------------------------------------- honest "proof" */}
         <Section
           id="true"
+          band="azure"
           heading="No testimonials yet. Here is what is true instead."
           lede="Lens is new, so there is no wall of logos to show you and none will be invented here. What can be checked is checkable: the builds exist, the code is readable, and the privacy claims are specific rather than reassuring."
         >
@@ -138,6 +168,7 @@ export default function App() {
         {/* ----------------------------------------------------- how it works */}
         <Section
           id="how"
+          band="jade"
           heading="Three steps, then a keyboard shortcut."
           lede="The only genuine setup cost is choosing a model, and Lens does that part for you."
         >
@@ -192,6 +223,7 @@ export default function App() {
         {/* ------------------------------------------------------------ price */}
         <Section
           id="price"
+          band="amber"
           heading="It costs nothing, and that is not a trial."
           lede="There is no server between you and the model, so there is no bill to pass on. That is the whole pricing story."
         >
@@ -246,7 +278,7 @@ export default function App() {
         </Section>
 
         {/* -------------------------------------------------------------- faq */}
-        <Section id="faq" heading="Questions worth answering plainly.">
+        <Section id="faq" band="rose" heading="Questions worth answering plainly.">
           <Faq />
         </Section>
       </main>

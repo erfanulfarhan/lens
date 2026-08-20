@@ -40,13 +40,13 @@ export function Aperture({ size = 132, animate = true, id = 'ap' }: Props) {
     <svg width={size} height={size} viewBox="0 0 200 200" aria-hidden="true">
       <defs>
         <linearGradient id={brass} x1="0.15" y1="0" x2="0.85" y2="1">
-          <stop offset="0" stopColor="var(--brass-lit)" />
-          <stop offset="0.45" stopColor="var(--brass)" />
+          <stop offset="0" stopColor="var(--amber-lit-fixed)" />
+          <stop offset="0.45" stopColor="var(--amber-fixed)" />
           <stop offset="1" stopColor="#6d5029" />
         </linearGradient>
         <radialGradient id={light} cx="0.4" cy="0.36" r="0.78">
           <stop offset="0" stopColor="#dcefe2" />
-          <stop offset="0.32" stopColor="var(--sage)" />
+          <stop offset="0.32" stopColor="var(--jade-fixed)" />
           <stop offset="1" stopColor="#1d3326" />
         </radialGradient>
 
