@@ -26,7 +26,11 @@ export function Shot({ src, alt, width, height, priority = false, caption }: Pro
       {/* Ambient brass bloom, sitting behind the glass rather than on it. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -inset-x-8 -inset-y-6 -z-10 rounded-[2.5rem] opacity-70 blur-3xl"
+        // inset-0, not a negative inset. A negative inset pushed the bloom
+        // 32px past the wrapper, and once the wrapper itself was 94vw that
+        // overflowed the viewport and gave the page a horizontal scrollbar on
+        // phones. The blur already spreads past these bounds on its own.
+        className="pointer-events-none absolute inset-0 -z-10 rounded-[2.5rem] opacity-70 blur-3xl"
         style={{
           background:
             'radial-gradient(60% 60% at 50% 0%, rgba(200,150,79,0.16), transparent 70%), radial-gradient(50% 50% at 70% 100%, rgba(127,168,139,0.10), transparent 70%)',

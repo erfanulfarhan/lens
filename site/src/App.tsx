@@ -79,7 +79,7 @@ export default function App() {
           </div>
 
           {/* Real product screenshot, not a mockup. */}
-          <div className="shot-rise mt-20 mb-4">
+          <div className="shot-rise relative left-1/2 mt-20 mb-4 w-[min(1320px,94vw)] -translate-x-1/2">
             <Shot
               src="/shot-workspace.png"
               alt="Lens answering three questions with the searchable chat history sidebar open; a LOCAL badge on each answer shows the model ran on this machine"
@@ -171,7 +171,7 @@ export default function App() {
             ))}
           </ol>
 
-          <div className="mt-24 flex flex-col gap-20">
+          <div className="relative left-1/2 mt-24 flex w-[min(1320px,94vw)] -translate-x-1/2 flex-col gap-20">
             <Shot
               src="/shot-answer.png"
               alt="The Lens panel answering a question, showing the model in use and the local status badge"
