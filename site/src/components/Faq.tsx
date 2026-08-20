@@ -20,17 +20,17 @@ export function Faq() {
             <button
               onClick={() => setOpen(isOpen ? null : i)}
               aria-expanded={isOpen}
-              className="flex w-full cursor-pointer items-start justify-between gap-8 py-6 text-left transition-colors duration-200 hover:text-[var(--brass-lit)]"
+              className="flex w-full cursor-pointer items-start justify-between gap-8 py-6 text-left transition-colors duration-150 hover:text-[var(--brass-lit)]"
             >
               <span className="display text-[1.4rem] leading-tight font-bold sm:text-[1.75rem]">
                 {item.q}
               </span>
               <span
                 aria-hidden="true"
-                className="mt-2 shrink-0 transition-transform duration-400"
+                className="mt-2 shrink-0"
                 style={{
                   transform: isOpen ? 'rotate(45deg)' : 'none',
-                  transitionTimingFunction: 'cubic-bezier(0.16,1,0.3,1)',
+                  transition: 'transform 180ms var(--ease-out)',
                 }}
               >
                 <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -38,12 +38,20 @@ export function Faq() {
                 </svg>
               </span>
             </button>
+            {/* Transitions, not keyframes: a disclosure is toggled rapidly and must
+                retarget from its current state mid-motion rather than restart.
+                220ms sits inside the 150-250ms budget for this family; the old
+                500ms felt sluggish. Properties are named rather than `all`,
+                which would animate unintended ones off the GPU.
+                grid-template-rows is a layout property and knowingly so: it is
+                the accessible way to animate to an unknown content height. */}
             <div
-              className="grid transition-all duration-500"
+              className="grid"
               style={{
                 gridTemplateRows: isOpen ? '1fr' : '0fr',
                 opacity: isOpen ? 1 : 0,
-                transitionTimingFunction: 'cubic-bezier(0.16,1,0.3,1)',
+                transition:
+                  'grid-template-rows 220ms var(--ease-out), opacity 220ms var(--ease-out)',
               }}
             >
               <div className="overflow-hidden">

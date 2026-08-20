@@ -17,7 +17,7 @@ function Section({
 }) {
   return (
     <section id={id} className="mx-auto w-full max-w-[1080px] px-6 pt-32 sm:pt-40">
-      <h2 className="display max-w-[24ch] text-[2.4rem] font-bold sm:text-[3.4rem]">{heading}</h2>
+      <h2 className="display max-w-[26ch] text-[2.1rem] font-extrabold sm:text-[2.9rem]">{heading}</h2>
       {lede && (
         <p className="measure mt-6 text-[16px] leading-[1.72] text-[var(--muted)]">{lede}</p>
       )}
@@ -49,7 +49,7 @@ export default function App() {
               read as an accident rather than a composition. */}
           <div className="grid items-center gap-14 lg:grid-cols-[1fr_auto] lg:gap-16">
           <div className="hero-resolve">
-            <h1 className="display max-w-[16ch] text-[clamp(2.6rem,7vw,5.2rem)] font-black">
+            <h1 className="display max-w-[19ch] text-[clamp(2.5rem,6.4vw,4.9rem)] font-black">
               It reads your screen. Your machine keeps it.
             </h1>
 

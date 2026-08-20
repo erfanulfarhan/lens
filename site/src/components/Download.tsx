@@ -30,7 +30,7 @@ export function Download({ compact = false }: { compact?: boolean }) {
       <div className="flex flex-wrap items-center gap-3">
         <a
           href={RELEASES}
-          className="group relative inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-[14px] font-medium transition-transform duration-300 hover:scale-[1.02]"
+          className="pressable group relative inline-flex items-center gap-3 rounded-full px-7 py-3.5 text-[14px] font-medium hover:scale-[1.02]"
           style={{
             background: 'linear-gradient(135deg, var(--brass-lit), var(--brass) 55%, var(--brass-dim))',
             color: '#17130c',
@@ -44,7 +44,7 @@ export function Download({ compact = false }: { compact?: boolean }) {
         </a>
         <a
           href={`${RELEASES}`}
-          className="rounded-full border border-[var(--line)] px-6 py-3.5 text-[14px] text-[var(--muted)] transition-colors duration-300 hover:border-[var(--brass-dim)] hover:text-[var(--paper)]"
+          className="pressable rounded-full border border-[var(--line)] px-6 py-3.5 text-[14px] text-[var(--muted)] hover:border-[var(--brass-dim)] hover:text-[var(--paper)]"
         >
           All platforms
         </a>

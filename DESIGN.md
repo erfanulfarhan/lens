@@ -29,11 +29,11 @@ locally and nothing else, so it keeps meaning.
 
 ## Type
 
-- **Display: Bodoni Moda.** A Didone, so it carries the same machined
-  high-contrast precision as the brass barrel. Used only at large sizes, where
-  its hairlines survive; anything under ~1.3rem takes the body face instead.
-  Fraunces was the first choice and was rejected: impeccable's detector flags it,
-  correctly, as part of the font monoculture AI-generated UIs converge on.
+- **Display: Archivo**, 800–900, tracking −0.036em. Sturdy and tightly set, so
+  it reads as a premium instrument rather than a magazine masthead. Two earlier
+  choices were rejected: Fraunces because the detector correctly flags it as part
+  of the AI font monoculture, and Bodoni Moda because a Didone read as fashion
+  editorial and its hairlines go spindly on a near-black ground.
 - **Body: Schibsted Grotesk.** Calm, slightly humanist, uncommon. Recedes under
   the Didone rather than competing with it. Inter and Instrument Sans were both
   rejected for the same monoculture reason.
@@ -41,6 +41,18 @@ locally and nothing else, so it keeps meaning.
   genuinely code and data. Never as a texture for "technical".
 
 Display caps at 6rem, tracking floor -0.04em, body measure 65–75ch.
+
+## Motion rules
+
+Timings and curves come from the animation audit catalog and are copied, not
+approximated: `--ease-out: cubic-bezier(0.23, 1, 0.32, 1)` for entrances,
+`--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1)` for on-screen movement.
+
+UI motion stays under 300ms: the FAQ disclosure is 220ms, its icon 180ms, press
+feedback 140ms with `scale(0.97)`. The marketing entrances are allowed to run
+longer. Disclosures use transitions rather than keyframes so a rapid toggle
+retargets from its current state instead of restarting, and no rule uses
+`transition: all`.
 
 ## Signature motion
 
