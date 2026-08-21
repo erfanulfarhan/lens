@@ -78,6 +78,11 @@ jobs:
         with:
           path: artifacts
       - name: Attach installers to the release
-        run: gh release upload "${GITHUB_REF_NAME}" $(find artifacts -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \)) --clobber --repo "$GITHUB_REPOSITORY"
+        # Null delimited into xargs, because the Windows installer is called
+        # "Lens Setup 0.1.4.exe" and an unquoted $(find ...) splits that name on
+        # its spaces into three arguments that match nothing.
+        run: |
+          find artifacts -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -print0 \
+            | xargs -0 gh release upload "${GITHUB_REF_NAME}" --clobber --repo "$GITHUB_REPOSITORY"
         env:
           GH_TOKEN: ${{ github.token }}
