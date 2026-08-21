@@ -52,23 +52,25 @@ export function Download({ compact = false }: { compact?: boolean }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap gap-2.5">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
         {shown.map((b) => (
           <a
             key={b.url}
             href={b.url}
-            className="pressable group flex items-center gap-3 rounded-xl border border-[var(--line)] px-5 py-3 transition-colors duration-150 hover:border-[var(--brass-dim)]"
+            className="pressable lift group flex min-h-[58px] items-center gap-3 rounded-xl border border-[var(--line)] px-4 py-3 transition-colors duration-150 hover:border-[var(--brass-dim)]"
             style={{ background: 'var(--panel)' }}
           >
             <span
               className="shrink-0 transition-colors duration-150"
               style={{ color: 'var(--brass)' }}
             >
-              <OsIcon os={b.os} size={20} />
+              <OsIcon os={b.icon} size={20} />
             </span>
-            <span className="flex flex-col leading-tight">
-              <span className="text-[13.5px] font-semibold text-[var(--paper)]">{b.label}</span>
-              <span className="text-[11.5px] text-[var(--faint)]">
+            <span className="flex min-w-0 flex-col leading-tight">
+              <span className="truncate text-[13.5px] font-semibold text-[var(--paper)]">
+                {b.label}
+              </span>
+              <span className="truncate text-[11.5px] text-[var(--faint)]">
                 {b.detail}
                 {b.sizeMb ? ` · ${b.sizeMb}MB` : ''}
               </span>

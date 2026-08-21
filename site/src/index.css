@@ -127,6 +127,20 @@ a { color: inherit; text-underline-offset: 0.22em; text-decoration-thickness: 1p
 .hero-resolve { animation: hero-resolve 900ms var(--ease-out) 480ms both; }
 .shot-rise { animation: shot-rise 800ms var(--ease-out) 760ms both; }
 
+/* The staged intro.
+   These pieces are hidden by CSS rather than by script so that nothing is ever
+   painted and then snatched away. The attribute is set in index.html, before
+   first paint, and cleared by playIntro() on completion or by its own fallback
+   timer, so a script that never runs cannot leave the hero blank. */
+html[data-intro='pending'] [data-intro-head] > *,
+html[data-intro='pending'] [data-intro-beam] > *,
+html[data-intro='pending'] [data-intro-ask],
+html[data-intro='pending'] [data-intro-lede],
+html[data-intro='pending'] [data-intro-cta] a,
+html[data-intro='pending'] [data-intro-shot] {
+  opacity: 0;
+}
+
 /* A supported mode: the open state is served immediately, nothing is hidden. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -135,6 +149,15 @@ a { color: inherit; text-underline-offset: 0.22em; text-decoration-thickness: 1p
     transition-duration: 1ms !important;
   }
   html { scroll-behavior: auto; }
+  /* The intro never runs, so its hidden state must not survive it. */
+  html[data-intro] [data-intro-head] > *,
+  html[data-intro] [data-intro-beam] > *,
+  html[data-intro] [data-intro-ask],
+  html[data-intro] [data-intro-lede],
+  html[data-intro] [data-intro-cta] a,
+  html[data-intro] [data-intro-shot] {
+    opacity: 1 !important;
+  }
 }
 
 /* Press feedback. Pressable things that do not answer the finger feel dead;

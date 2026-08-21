@@ -9,6 +9,8 @@
     "deploy": "npm run build && wrangler pages deploy dist --project-name getlens"
   },
   "dependencies": {
+    "animejs": "^4.5.0",
+    "motion": "^13.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

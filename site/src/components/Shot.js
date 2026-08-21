@@ -30,5 +30,8 @@ export function Shot({ src, alt, width, height, priority = false, caption }) {
                     // A hairline rim, brighter along the top edge where light would land.
                     border: '1px solid rgba(255,255,255,0.09)',
                     background: 'var(--panel)',
-                }, children: [_jsx("div", { "aria-hidden": "true", className: "pointer-events-none absolute inset-0 rounded-[14px]", style: { boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)' } }), _jsx("img", { src: src, alt: alt, width: width, height: height, loading: priority ? 'eager' : 'lazy', decoding: priority ? 'sync' : 'async', className: "block w-full" })] }), caption && (_jsx("figcaption", { className: "mt-4 text-[13px] leading-relaxed text-[var(--faint)]", children: caption }))] }));
+                }, children: [_jsx("div", { "aria-hidden": "true", className: "pointer-events-none absolute inset-0 rounded-[14px]", style: { boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)' } }), _jsx("img", { src: src, alt: alt, width: width, height: height, loading: priority ? 'eager' : 'lazy', decoding: priority ? 'sync' : 'async', 
+                        // The browser's native image drag would otherwise swallow the gesture
+                        // before the carousel ever sees it, leaving the shots unflickable.
+                        draggable: false, className: "block w-full select-none" })] }), caption && (_jsx("figcaption", { className: "mt-4 text-[13px] leading-relaxed text-[var(--faint)]", children: caption }))] }));
 }

@@ -4,7 +4,9 @@
  * One consistent 1.6 stroke and a shared 24 box, so the three sit together as a
  * set rather than three borrowed logos at three optical weights.
  */
-export function OsIcon({ os, size = 22 }: { os: 'mac' | 'windows' | 'linux'; size?: number }) {
+export type IconName = 'mac' | 'windows' | 'linux' | 'debian' | 'fedora';
+
+export function OsIcon({ os, size = 22 }: { os: IconName; size?: number }) {
   const common = {
     width: size,
     height: size,
@@ -39,6 +41,36 @@ export function OsIcon({ os, size = 22 }: { os: 'mac' | 'windows' | 'linux'; siz
         <rect x="12.9" y="4" width="7.6" height="7.2" rx="0.8" stroke="currentColor" strokeWidth="1.6" />
         <rect x="3.5" y="12.8" width="7.6" height="7.2" rx="0.8" stroke="currentColor" strokeWidth="1.6" />
         <rect x="12.9" y="12.8" width="7.6" height="7.2" rx="0.8" stroke="currentColor" strokeWidth="1.6" />
+      </svg>
+    );
+  }
+
+  if (os === 'debian') {
+    // The swirl, read as an open spiral rather than the filled brand logo.
+    return (
+      <svg {...common}>
+        <path
+          d="M15.6 8.2a4.6 4.6 0 1 0 .6 6.9"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+        <circle cx="12" cy="12" r="8.6" stroke="currentColor" strokeWidth="1.6" strokeDasharray="3.4 3" />
+      </svg>
+    );
+  }
+
+  if (os === 'fedora') {
+    // The infinity-f: a circle with the stem hooking out of it.
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8.6" stroke="currentColor" strokeWidth="1.6" />
+        <path
+          d="M9.2 12h4.1m0 0V9.4a2 2 0 0 1 2-2h1.1m-3.1 4.6v5"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
       </svg>
     );
   }

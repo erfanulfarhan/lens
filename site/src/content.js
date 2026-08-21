@@ -104,3 +104,36 @@ export const FAQ = [
         a: 'Not yet. Call transcription uses a small Swift helper built against ScreenCaptureKit, which has no equivalent on other platforms. Everything else — screen questions, documents, memory, web search — works everywhere.',
     },
 ];
+/**
+ * The screenshot carousel.
+ *
+ * Real captures, not mockups, and each one is here to answer a different
+ * question a visitor actually has: what does an answer look like, can I use a
+ * model I already pay for, and does it work before I have set anything up.
+ */
+export const SHOTS = [
+    {
+        src: '/shot-answer.png',
+        alt: 'The Lens panel answering a question, showing the model in use and the local status badge',
+        width: 2240,
+        height: 600,
+        title: 'One question, one answer',
+        body: 'The badge on the answer says where it ran. LOCAL means the exchange never left the machine.',
+    },
+    {
+        src: '/shot-settings.png',
+        alt: 'Settings: choosing a provider, adding an API key and viewing keyboard shortcuts',
+        width: 1800,
+        height: 900,
+        title: 'Local model, or a key you already own',
+        body: 'Pick a model Lens has matched to your hardware, or paste a key for a provider you already pay for.',
+    },
+    {
+        src: '/shot-ready.png',
+        alt: 'Lens on first launch, reporting which local model it found and that it is ready',
+        width: 1800,
+        height: 900,
+        title: 'Ready on first launch',
+        body: 'It checks what your machine can run and tells you, rather than asking you to guess at a model list.',
+    },
+];

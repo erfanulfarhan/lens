@@ -14,6 +14,9 @@ import { RELEASES, REPO } from '../content';
 
 export interface Build {
   os: 'mac' | 'windows' | 'linux';
+  /** Which mark to draw. The three Linux builds are different distributions and
+   *  deserve their own, rather than sharing one penguin between them. */
+  icon: 'mac' | 'windows' | 'linux' | 'debian' | 'fedora';
   label: string;
   detail: string;
   url: string;
@@ -30,13 +33,13 @@ const CACHE_KEY = 'lens.releases.v1';
 const CACHE_MS = 6 * 60 * 60 * 1000;
 
 /** Matched most-specific first: `-arm64.dmg` must win over a bare `.dmg`. */
-const RULES: Array<{ os: Build['os']; label: string; detail: string; test: (n: string) => boolean }> = [
-  { os: 'mac', label: 'macOS', detail: 'Apple Silicon', test: (n) => /arm64\.dmg$/i.test(n) },
-  { os: 'mac', label: 'macOS', detail: 'Intel', test: (n) => /\.dmg$/i.test(n) },
-  { os: 'windows', label: 'Windows', detail: 'Installer', test: (n) => /\.exe$/i.test(n) },
-  { os: 'linux', label: 'Linux', detail: 'AppImage', test: (n) => /\.AppImage$/i.test(n) && !/arm64/i.test(n) },
-  { os: 'linux', label: 'Debian, Ubuntu', detail: '.deb', test: (n) => /amd64\.deb$/i.test(n) },
-  { os: 'linux', label: 'Fedora, RHEL', detail: '.rpm', test: (n) => /x86_64\.rpm$/i.test(n) },
+const RULES: Array<{ os: Build['os']; icon: Build['icon']; label: string; detail: string; test: (n: string) => boolean }> = [
+  { os: 'mac', icon: 'mac', label: 'macOS', detail: 'Apple Silicon', test: (n) => /arm64\.dmg$/i.test(n) },
+  { os: 'mac', icon: 'mac', label: 'macOS', detail: 'Intel', test: (n) => /\.dmg$/i.test(n) },
+  { os: 'windows', icon: 'windows', label: 'Windows', detail: 'Installer', test: (n) => /\.exe$/i.test(n) },
+  { os: 'linux', icon: 'linux', label: 'Linux', detail: 'AppImage', test: (n) => /\.AppImage$/i.test(n) && !/arm64/i.test(n) },
+  { os: 'linux', icon: 'debian', label: 'Debian, Ubuntu', detail: '.deb', test: (n) => /amd64\.deb$/i.test(n) },
+  { os: 'linux', icon: 'fedora', label: 'Fedora, RHEL', detail: '.rpm', test: (n) => /x86_64\.rpm$/i.test(n) },
 ];
 
 export async function fetchBuilds(): Promise<{ builds: Build[]; version: string | null }> {
@@ -66,6 +69,7 @@ export async function fetchBuilds(): Promise<{ builds: Build[]; version: string 
       used.add(hit.name);
       builds.push({
         os: rule.os,
+        icon: rule.icon,
         label: rule.label,
         detail: rule.detail,
         url: hit.browser_download_url,

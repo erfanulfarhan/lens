@@ -1,10 +1,4 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-/**
- * Drawn marks, not emoji.
- *
- * One consistent 1.6 stroke and a shared 24 box, so the three sit together as a
- * set rather than three borrowed logos at three optical weights.
- */
 export function OsIcon({ os, size = 22 }) {
     const common = {
         width: size,
@@ -18,6 +12,14 @@ export function OsIcon({ os, size = 22 }) {
     }
     if (os === 'windows') {
         return (_jsxs("svg", { ...common, children: [_jsx("rect", { x: "3.5", y: "4", width: "7.6", height: "7.2", rx: "0.8", stroke: "currentColor", strokeWidth: "1.6" }), _jsx("rect", { x: "12.9", y: "4", width: "7.6", height: "7.2", rx: "0.8", stroke: "currentColor", strokeWidth: "1.6" }), _jsx("rect", { x: "3.5", y: "12.8", width: "7.6", height: "7.2", rx: "0.8", stroke: "currentColor", strokeWidth: "1.6" }), _jsx("rect", { x: "12.9", y: "12.8", width: "7.6", height: "7.2", rx: "0.8", stroke: "currentColor", strokeWidth: "1.6" })] }));
+    }
+    if (os === 'debian') {
+        // The swirl, read as an open spiral rather than the filled brand logo.
+        return (_jsxs("svg", { ...common, children: [_jsx("path", { d: "M15.6 8.2a4.6 4.6 0 1 0 .6 6.9", stroke: "currentColor", strokeWidth: "1.6", strokeLinecap: "round" }), _jsx("circle", { cx: "12", cy: "12", r: "8.6", stroke: "currentColor", strokeWidth: "1.6", strokeDasharray: "3.4 3" })] }));
+    }
+    if (os === 'fedora') {
+        // The infinity-f: a circle with the stem hooking out of it.
+        return (_jsxs("svg", { ...common, children: [_jsx("circle", { cx: "12", cy: "12", r: "8.6", stroke: "currentColor", strokeWidth: "1.6" }), _jsx("path", { d: "M9.2 12h4.1m0 0V9.4a2 2 0 0 1 2-2h1.1m-3.1 4.6v5", stroke: "currentColor", strokeWidth: "1.6", strokeLinecap: "round" })] }));
     }
     return (_jsxs("svg", { ...common, children: [_jsx("path", { d: "M12 2.8c-2.1 0-3 1.7-3 3.4 0 1.2.2 2-.3 3-.6 1.2-2.1 2.6-2.1 4.6 0 .8.3 1.3.8 1.6-.3.9.1 1.7 1 2.2 1.3.7 3.3.9 3.6.9s2.3-.2 3.6-.9c.9-.5 1.3-1.3 1-2.2.5-.3.8-.8.8-1.6 0-2-1.5-3.4-2.1-4.6-.5-1-.3-1.8-.3-3 0-1.7-.9-3.4-3-3.4Z", stroke: "currentColor", strokeWidth: "1.6", strokeLinejoin: "round" }), _jsx("path", { d: "M10.4 7.4h.01M13.6 7.4h.01", stroke: "currentColor", strokeWidth: "1.9", strokeLinecap: "round" })] }));
 }

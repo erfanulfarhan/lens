@@ -64,7 +64,10 @@ export function Shot({ src, alt, width, height, priority = false, caption }: Pro
           height={height}
           loading={priority ? 'eager' : 'lazy'}
           decoding={priority ? 'sync' : 'async'}
-          className="block w-full"
+          // The browser's native image drag would otherwise swallow the gesture
+          // before the carousel ever sees it, leaving the shots unflickable.
+          draggable={false}
+          className="block w-full select-none"
         />
       </div>
 
