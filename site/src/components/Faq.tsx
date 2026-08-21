@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FAQ } from '../content';
 
 /**
@@ -10,6 +10,26 @@ import { FAQ } from '../content';
  */
 export function Faq() {
   const [open, setOpen] = useState<number | null>(0);
+
+  // Structured data for the questions, built from the same array the page
+  // renders. Written from here rather than pasted into index.html so the two
+  // cannot drift: a hand-kept copy would still be answering last month's
+  // questions the first time someone edited this list.
+  useEffect(() => {
+    const tag = document.createElement('script');
+    tag.type = 'application/ld+json';
+    tag.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: FAQ.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
+    });
+    document.head.appendChild(tag);
+    return () => tag.remove();
+  }, []);
 
   return (
     <ul className="mt-14 list-none p-0">

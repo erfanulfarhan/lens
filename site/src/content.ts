@@ -108,12 +108,24 @@ export const FAQ = [
     a: 'Not necessarily. Lens reads your RAM and VRAM on first run and suggests a model that will run smoothly on what you have. If you own a desktop with a real GPU, you can leave inference there and run the panel on a laptop over your own network.',
   },
   {
+    q: 'Can I use an API key I already pay for?',
+    a: 'Yes. Claude, Gemini, OpenAI and Groq are all in settings, and you can switch between them and your local model whenever you like. Keys are encrypted by your operating system keychain and the app never reads them back into its own interface, only which providers have one stored. A key is sent to the provider it belongs to and nowhere else.',
+  },
+  {
+    q: 'Why is the Windows download only about a megabyte?',
+    a: 'That one is a web installer: a small program that fetches the app while it is running, so the wait happens after you have decided to install rather than before. The full self contained installer is there too, on the same release page, for an offline machine or if you would rather have one file. Both install the same app.',
+  },
+  {
+    q: 'How do updates work?',
+    a: 'The app checks the releases page for you and tells you when there is a newer version, with the notes, and waits for you to say yes. On Windows it can then install itself. On macOS and Linux it downloads the installer and opens it, because quietly replacing an application while you are using it is not a thing software should do behind your back.',
+  },
+  {
     q: 'Why does my machine warn me when I open it?',
-    a: 'The installers are not code-signed yet. On macOS, right-click the app and choose Open the first time. On Windows, choose More info, then Run anyway. Linux needs nothing.',
+    a: 'The installers are not code-signed yet, so your operating system cannot tell who built them. On macOS, right-click the app and choose Open the first time. On Windows, choose More info, then Run anyway. Linux needs nothing. Every build is made in public by a workflow in the repository, so you can read what produced the file you downloaded.',
   },
   {
     q: 'Can it listen to calls on Windows or Linux?',
-    a: 'Not yet. Call transcription uses a small Swift helper built against ScreenCaptureKit, which has no equivalent on other platforms. Everything else works everywhere: screen questions, documents, memory and web search.',
+    a: 'Not yet, and it is only that one feature. Listening means Lens taps the audio your machine is playing, which is the other people on a call, transcribes it on the device, and lets you ask about what was just said. That is built on two Apple frameworks with no equivalent elsewhere: ScreenCaptureKit for the audio and on-device speech recognition for the words. On Windows and Linux the Listen control is not shown at all rather than being offered and failing. Everything else works on all three: questions about your screen, your own documents, chat history, memory and web search.',
   },
 ];
 
