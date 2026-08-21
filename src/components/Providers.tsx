@@ -81,12 +81,7 @@ export function Providers({
                     (active ? 'bg-brass' : usable ? 'bg-sage/60' : 'bg-muted/40')
                   }
                 />
-                <span
-                  className={
-                    'shrink-0 ' +
-                    (active ? 'text-brass' : usable ? 'text-paper/70' : 'text-muted/60')
-                  }
-                >
+                <span className="flex shrink-0 text-paper">
                   <ProviderMark id={p.id} />
                 </span>
                 <span className="text-[12.5px] font-medium text-paper">{p.label}</span>
