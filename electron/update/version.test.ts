@@ -91,6 +91,35 @@ describe('assetFor', () => {
     ],
   })!
 
+  // Windows ships two installers: a ~1MB stub that fetches the app while it
+  // runs, and the full self contained one. find() on ".exe" would take
+  // whichever GitHub happened to list first, so the choice is made explicit.
+  it('prefers the Windows web stub over the full installer', () => {
+    const both = parseRelease({
+      tag_name: 'v0.2.0',
+      assets: [
+        { name: 'Lens-Setup-0.2.0.exe', browser_download_url: 'https://d/full.exe', size: 116_000_000 },
+        { name: 'Lens-Web-Setup-0.2.0.exe', browser_download_url: 'https://d/web.exe', size: 1_100_000 },
+      ],
+    })!
+    expect(assetFor(both, 'win32', 'x64')?.name).toBe('Lens-Web-Setup-0.2.0.exe')
+  })
+
+  it('falls back to the full installer when no stub is published', () => {
+    expect(assetFor(release, 'win32', 'x64')?.name).toBe('Lens-Setup-0.2.0.exe')
+  })
+
+  it('is order independent about which installer it picks', () => {
+    const reversed = parseRelease({
+      tag_name: 'v0.2.0',
+      assets: [
+        { name: 'Lens-Web-Setup-0.2.0.exe', browser_download_url: 'https://d/web.exe', size: 1 },
+        { name: 'Lens-Setup-0.2.0.exe', browser_download_url: 'https://d/full.exe', size: 1 },
+      ],
+    })!
+    expect(assetFor(reversed, 'win32', 'x64')?.name).toBe('Lens-Web-Setup-0.2.0.exe')
+  })
+
   it('picks the Apple Silicon build on arm64', () => {
     expect(assetFor(release, 'darwin', 'arm64')?.name).toContain('arm64')
   })

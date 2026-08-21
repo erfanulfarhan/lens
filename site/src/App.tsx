@@ -3,12 +3,13 @@ import { Aperture } from './components/Aperture';
 import { Demo } from './components/Demo';
 import { Reveal } from './components/Reveal';
 import { Words } from './components/Words';
+import { LiveVersion } from './components/LiveVersion';
 import { COLUMN, HEAD, RISE } from './lib/hero-motion';
 import { Rail } from './components/Rail';
 import { Download } from './components/Download';
 import { Shot } from './components/Shot';
 import { Faq } from './components/Faq';
-import { LEDGER, REPO, SHOTS, STEPS, VERSION } from './content';
+import { LEDGER, REPO, SHOTS, STEPS } from './content';
 
 /** Section shell: consistent rhythm, more space above a heading than below it. */
 type Band = 'violet' | 'azure' | 'jade' | 'amber' | 'rose';
@@ -309,7 +310,7 @@ export default function App() {
           </div>
         </div>
         <p className="mt-10 text-[12.5px] text-[var(--faint)]">
-          {VERSION} · Lens does not hide itself from screen sharing, by design.
+          <LiveVersion /> · Lens does not hide itself from screen sharing, by design.
         </p>
       </footer>
     </>

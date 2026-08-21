@@ -36,11 +36,21 @@ const CACHE_MS = 6 * 60 * 60 * 1000;
 const RULES: Array<{ os: Build['os']; icon: Build['icon']; label: string; detail: string; test: (n: string) => boolean }> = [
   { os: 'mac', icon: 'mac', label: 'macOS', detail: 'Apple Silicon', test: (n) => /arm64\.dmg$/i.test(n) },
   { os: 'mac', icon: 'mac', label: 'macOS', detail: 'Intel', test: (n) => /\.dmg$/i.test(n) },
+  // Two Windows rows, and which of them appear depends on what the release
+  // actually carries. The stub is matched first so that on a release holding
+  // both, each row describes the right file rather than the label being a guess.
   {
     os: 'windows',
     icon: 'windows',
     label: 'Windows',
     detail: 'Web installer',
+    test: (n) => /web[-. ]?setup.*\.exe$/i.test(n),
+  },
+  {
+    os: 'windows',
+    icon: 'windows',
+    label: 'Windows',
+    detail: 'Full installer',
     test: (n) => /\.exe$/i.test(n),
   },
   { os: 'linux', icon: 'linux', label: 'Linux', detail: 'AppImage', test: (n) => /\.AppImage$/i.test(n) && !/arm64/i.test(n) },
@@ -50,38 +60,70 @@ const RULES: Array<{ os: Build['os']; icon: Build['icon']; label: string; detail
 
 type Result = { builds: Build[]; version: string | null };
 
-/** Reads the live release and maps its assets onto the six download slots. */
+/** Maps one release's assets onto the six download slots. */
+function mapAssets(assets: Asset[]): Build[] {
+  const used = new Set<string>();
+  const builds: Build[] = [];
+  for (const rule of RULES) {
+    const hit = assets.find((a) => !used.has(a.name) && rule.test(a.name));
+    if (!hit) continue;
+    used.add(hit.name);
+    builds.push({
+      os: rule.os,
+      icon: rule.icon,
+      label: rule.label,
+      detail: rule.detail,
+      url: hit.browser_download_url,
+      sizeMb: Math.round(hit.size / 1048576),
+    });
+  }
+  return builds;
+}
+
+/**
+ * The newest release that people can actually download.
+ *
+ * Deliberately the release list rather than /releases/latest. A release exists
+ * from the moment it is created, but its installers are attached minutes later
+ * when the build finishes, and for that whole window /releases/latest returns a
+ * version with no assets. This page used to take that at face value, match none
+ * of its six rules, and collapse to a single bare link to the releases page,
+ * which is what it did during 0.1.5. Walking down the list instead means the
+ * previous version's downloads stay up until the new ones are ready.
+ *
+ * The version reported is the release the buttons actually point at, so the page
+ * never claims a version it is not serving.
+ */
 async function load(): Promise<Result> {
   try {
     const slug = REPO.split('github.com/')[1];
-    const r = await fetch(`https://api.github.com/repos/${slug}/releases/latest`, {
+    const r = await fetch(`https://api.github.com/repos/${slug}/releases?per_page=10`, {
       headers: { Accept: 'application/vnd.github+json' },
     });
     if (!r.ok) return { builds: [], version: null };
-    const json = (await r.json()) as { tag_name: string; assets: Asset[] };
+    const list = (await r.json()) as Array<{
+      tag_name: string;
+      draft: boolean;
+      prerelease: boolean;
+      assets: Asset[];
+    }>;
 
-    const used = new Set<string>();
-    const builds: Build[] = [];
-    for (const rule of RULES) {
-      const hit = json.assets.find((a) => !used.has(a.name) && rule.test(a.name));
-      if (!hit) continue;
-      used.add(hit.name);
-      builds.push({
-        os: rule.os,
-        icon: rule.icon,
-        label: rule.label,
-        detail: rule.detail,
-        url: hit.browser_download_url,
-        sizeMb: Math.round(hit.size / 1048576),
-      });
-    }
+    for (const rel of list) {
+      if (rel.draft || rel.prerelease) continue;
+      const builds = mapAssets(rel.assets ?? []);
+      if (!builds.length) continue;
 
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), builds, version: json.tag_name }));
-    } catch {
-      /* storage blocked or full */
+      try {
+        localStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify({ at: Date.now(), builds, version: rel.tag_name }),
+        );
+      } catch {
+        /* storage blocked or full */
+      }
+      return { builds, version: rel.tag_name };
     }
-    return { builds, version: json.tag_name };
+    return { builds: [], version: null };
   } catch {
     return { builds: [], version: null };
   }

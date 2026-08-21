@@ -112,7 +112,14 @@ export function assetFor(
   arch: string
 ): ReleaseAsset | null {
   const assets = release.assets
-  if (platform === 'win32') return assets.find((a) => a.name.endsWith('.exe')) ?? null
+  if (platform === 'win32') {
+    // Two installers ship for Windows now, and find() would otherwise pick
+    // whichever the release happened to list first. Prefer the web stub: it is
+    // about a megabyte and fetches the rest while it runs, so an update is a
+    // small download either way. Fall back to the full installer.
+    const exes = assets.filter((a) => a.name.endsWith('.exe'))
+    return exes.find((a) => /web[-. ]?setup/i.test(a.name)) ?? exes[0] ?? null
+  }
   if (platform === 'darwin') {
     const dmgs = assets.filter((a) => a.name.endsWith('.dmg'))
     // Apple Silicon builds are marked arm64; anything else is the Intel build.
