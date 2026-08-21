@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { OsIcon } from './OsIcon';
+import { GRID, TILE } from '../lib/hero-motion';
 import { fetchBuilds, FALLBACK, type Build } from '../lib/releases';
 
 /**
@@ -52,12 +54,24 @@ export function Download({ compact = false }: { compact?: boolean }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={GRID}
+        className="grid grid-cols-2 gap-2.5 sm:grid-cols-3"
+      >
         {shown.map((b) => (
-          <a
+          <motion.a
             key={b.url}
             href={b.url}
-            className="pressable lift group flex min-h-[58px] items-center gap-3 rounded-xl border border-[var(--line)] px-4 py-3 transition-colors duration-150 hover:border-[var(--brass-dim)]"
+            variants={TILE}
+            // Hover and press live here rather than in the .lift class: a CSS
+            // transition on transform fights an animation that sets transform
+            // every frame, and the entrance was the casualty.
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.985 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+            className="group flex min-h-[58px] items-center gap-3 rounded-xl border border-[var(--line)] px-4 py-3 transition-colors duration-150 hover:border-[var(--brass-dim)]"
             style={{ background: 'var(--panel)' }}
           >
             <span
@@ -75,9 +89,9 @@ export function Download({ compact = false }: { compact?: boolean }) {
                 {b.sizeMb ? ` · ${b.sizeMb}MB` : ''}
               </span>
             </span>
-          </a>
+          </motion.a>
         ))}
-      </div>
+      </motion.div>
 
       {!compact && (
         <p className="text-[13px] leading-relaxed text-[var(--faint)]">

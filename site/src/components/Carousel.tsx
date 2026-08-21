@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { Shot } from './Shot';
 
 export interface Slide {
   src: string;
   alt: string;
-  width: number;
-  height: number;
   title: string;
   body: string;
 }
@@ -19,14 +16,17 @@ const VELOCITY = 420;
 /**
  * The screenshot carousel.
  *
- * Three shots stacked in one frame rather than three stacked down the page.
- * The page is long enough already, and a person deciding whether to download
- * something wants to flick through what it looks like, not scroll past it.
+ * The frame is drawn once and never moves; only the picture inside it changes.
+ * The first version gave each slide its own Shot, which meant each slide also
+ * brought its own height: these captures run from a 4.3:1 strip to a 2:1 panel,
+ * so the frame lurched by hundreds of pixels on every change and shoved the
+ * caption down the page. Fixing the aspect ratio here and containing each image
+ * inside it costs some empty background on the narrower shots and buys a frame
+ * that behaves like a window rather than a concertina.
  *
- * It advances on its own so a first visit shows more than one screen without
- * being touched, and stops the moment someone takes hold of it: an autoplay
- * that fights the pointer is worse than no autoplay. Draggable on a phone,
- * arrow keys and dots on a desktop.
+ * It advances on its own so a first visit sees more than one screen without
+ * being touched, and stops the moment someone takes hold of it. Draggable on a
+ * phone, arrow keys and dots on a desktop.
  */
 export function Carousel({ slides }: { slides: readonly Slide[] }) {
   const [index, setIndex] = useState(0);
@@ -71,39 +71,76 @@ export function Carousel({ slides }: { slides: readonly Slide[] }) {
       onPointerEnter={() => setHeld(true)}
       onPointerLeave={() => setHeld(false)}
     >
-      <div
-        ref={frame}
-        tabIndex={0}
-        role="group"
-        aria-roledescription="carousel"
-        aria-label="Screenshots of Lens"
-        className="relative overflow-hidden rounded-[16px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-      >
-        {/* mode="popLayout" so the outgoing shot leaves the layout at once and
-            the incoming one is not pushed a frame down the page as it enters. */}
-        <AnimatePresence initial={false} mode="popLayout" custom={direction}>
-          <motion.div
-            key={slide.src}
-            custom={direction}
-            drag={reduce ? false : 'x'}
-            dragElastic={0.16}
-            dragConstraints={{ left: 0, right: 0 }}
-            dragMomentum={false}
-            onDragStart={() => setHeld(true)}
-            onDragEnd={(_, info) => {
-              const throwX = info.offset.x + info.velocity.x * 0.12;
-              if (throwX < -DISTANCE || info.velocity.x < -VELOCITY) go(1);
-              else if (throwX > DISTANCE || info.velocity.x > VELOCITY) go(-1);
-            }}
-            initial={{ opacity: 0, x: direction * 64, scale: 0.985 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: direction * -64, scale: 0.985, position: 'absolute' }}
-            transition={{ type: 'spring', stiffness: 320, damping: 34, mass: 0.9 }}
-            className="inset-0 cursor-grab active:cursor-grabbing"
-          >
-            <Shot src={slide.src} alt={slide.alt} width={slide.width} height={slide.height} />
-          </motion.div>
-        </AnimatePresence>
+      {/* Ambient bloom, sitting behind the glass rather than on it. */}
+      <div className="relative">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 rounded-[2.5rem] opacity-70 blur-3xl"
+          style={{
+            background:
+              'radial-gradient(60% 60% at 50% 0%, rgba(200,150,79,0.16), transparent 70%), radial-gradient(50% 50% at 70% 100%, rgba(127,168,139,0.10), transparent 70%)',
+          }}
+        />
+
+        <div
+          ref={frame}
+          tabIndex={0}
+          role="group"
+          aria-roledescription="carousel"
+          aria-label="Screenshots of Lens"
+          className="relative overflow-hidden rounded-[14px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          style={{
+            // 3:1 sits between the strips and the panel shot, so nothing is
+            // shrunk far and nothing is cropped at all.
+            aspectRatio: '3 / 1',
+            background: 'var(--panel)',
+            border: '1px solid rgba(255,255,255,0.09)',
+            boxShadow: [
+              '0 1px 2px rgba(0,0,0,0.5)',
+              '0 10px 22px -8px rgba(0,0,0,0.55)',
+              '0 44px 90px -30px rgba(0,0,0,0.92)',
+            ].join(', '),
+          }}
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-10 rounded-[14px]"
+            style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)' }}
+          />
+
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.div
+              key={slide.src}
+              custom={direction}
+              drag={reduce ? false : 'x'}
+              dragElastic={0.16}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragMomentum={false}
+              onDragStart={() => setHeld(true)}
+              onDragEnd={(_, info) => {
+                const throwX = info.offset.x + info.velocity.x * 0.12;
+                if (throwX < -DISTANCE || info.velocity.x < -VELOCITY) go(1);
+                else if (throwX > DISTANCE || info.velocity.x > VELOCITY) go(-1);
+              }}
+              initial={{ opacity: 0, x: direction * 64 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction * -64 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 34, mass: 0.9 }}
+              className="absolute inset-0 flex cursor-grab items-center justify-center active:cursor-grabbing"
+            >
+              <img
+                src={slide.src}
+                alt={slide.alt}
+                loading="lazy"
+                decoding="async"
+                // The browser's native image drag would otherwise swallow the
+                // gesture before the carousel ever sees it.
+                draggable={false}
+                className="max-h-full max-w-full object-contain select-none"
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* The caption is part of the control row, not floating under the image,
@@ -148,7 +185,9 @@ export function Carousel({ slides }: { slides: readonly Slide[] }) {
                 style={{
                   width: i === index ? 26 : 6,
                   background:
-                    i === index ? 'var(--accent-lit)' : 'color-mix(in srgb, var(--paper) 26%, transparent)',
+                    i === index
+                      ? 'var(--accent-lit)'
+                      : 'color-mix(in srgb, var(--paper) 26%, transparent)',
                 }}
               />
             </button>

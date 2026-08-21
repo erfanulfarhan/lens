@@ -1,1 +1,4 @@
 .vercel
+
+# tsc used to be told to emit here; it must not, and never should again.
+src/**/*.js

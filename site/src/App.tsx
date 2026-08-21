@@ -1,12 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
 import { Aperture } from './components/Aperture';
 import { Carousel } from './components/Carousel';
+import { Reveal } from './components/Reveal';
+import { Words } from './components/Words';
+import { COLUMN, HEAD, RISE } from './lib/hero-motion';
 import { Rail } from './components/Rail';
 import { Typed } from './components/Typed';
 import { Download } from './components/Download';
 import { Shot } from './components/Shot';
 import { Faq } from './components/Faq';
-import { playIntro, revealOnScroll } from './lib/intro';
 import { ASKED, LEDGER, REPO, SHOTS, STEPS, VERSION } from './content';
 
 /** Section shell: consistent rhythm, more space above a heading than below it. */
@@ -32,9 +34,13 @@ function Section({
       data-band={band}
       className="mx-auto w-full max-w-[1080px] px-6 pt-32 sm:pt-40"
     >
-      <h2 data-reveal className="display max-w-[26ch] text-[2.1rem] font-extrabold sm:text-[2.9rem]">{heading}</h2>
+      <Reveal tag="h2" className="display max-w-[26ch] text-[2.1rem] font-extrabold sm:text-[2.9rem]">
+        {heading}
+      </Reveal>
       {lede && (
-        <p data-reveal className="measure mt-6 text-[16px] leading-[1.72] text-[var(--muted)]">{lede}</p>
+        <Reveal tag="p" delay={0.08} className="measure mt-6 text-[16px] leading-[1.72] text-[var(--muted)]">
+          {lede}
+        </Reveal>
       )}
       {children}
     </section>
@@ -42,18 +48,8 @@ function Section({
 }
 
 export default function App() {
-  const page = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const root = page.current;
-    if (!root) return;
-    const stop = playIntro(document.documentElement);
-    revealOnScroll(root);
-    return stop;
-  }, []);
-
   return (
-    <div ref={page}>
+    <>
       <Rail />
       <header className="mx-auto flex w-full max-w-[1080px] items-center justify-between px-6 py-7">
         <div className="flex items-center gap-3">
@@ -77,35 +73,43 @@ export default function App() {
               behind the headline ran the type straight through the metal, which
               read as an accident rather than a composition. */}
           <div className="grid items-center gap-14 lg:grid-cols-[1fr_auto] lg:gap-16">
-          <div>
-            <h1 data-intro-head className="display max-w-[19ch] text-[clamp(2.5rem,6.4vw,4.9rem)] font-black">
-              It reads your screen. <span className="lit">Your machine keeps it.</span>
-            </h1>
+          <motion.div initial="hidden" animate="show" variants={COLUMN}>
+            <motion.h1
+              variants={HEAD}
+              className="display max-w-[19ch] text-[clamp(2.5rem,6.4vw,4.9rem)] font-black"
+            >
+              <Words text="It reads your screen." />{' '}
+              {/* The treatment sits on the phrase, not each word, so a gradient
+                  across it is not restarted six times. */}
+              <span className="lit">
+                <Words text="Your machine keeps it." />
+              </span>
+            </motion.h1>
 
             {/* White light in, spectrum out: the reason the page changes colour. */}
-            <div data-intro-beam className="mt-9 flex max-w-[34rem] items-center gap-1.5" aria-hidden>
+            <motion.div variants={RISE} className="mt-9 flex max-w-[34rem] items-center gap-1.5" aria-hidden>
               <div className="beam w-1/3 origin-left" />
               <Aperture size={18} animate={false} id="ap-prism" />
               <div className="prism-out flex-1 origin-left" />
-            </div>
+            </motion.div>
 
             {/* A mock composer, typing what people really ask it. */}
-            <div data-intro-ask className="mt-7 max-w-[34rem] rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3">
+            <motion.div variants={RISE} className="mt-7 max-w-[34rem] rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3">
               <p className="text-[15px] leading-[1.6] sm:text-[16px]">
                 <Typed lines={ASKED} />
               </p>
-            </div>
+            </motion.div>
 
-            <p data-intro-lede className="measure mt-7 text-[17px] leading-[1.7] text-[var(--muted)] sm:text-[18px]">
+            <motion.p variants={RISE} className="measure mt-7 text-[17px] leading-[1.7] text-[var(--muted)] sm:text-[18px]">
               Ask about anything on screen, anything just said on a call, or anything in your own
               documents. The model runs on your computer, so there is no subscription and nothing is
               uploaded — the same idea as the assistants you rent, built the other way round.
-            </p>
+            </motion.p>
 
-            <div data-intro-cta className="mt-11">
+            <motion.div variants={RISE} className="mt-11">
               <Download />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
             {/* The mark opens once, alongside the claim it illustrates. Shown at
                 every width: hiding it below lg removed the page's one authored
@@ -121,7 +125,7 @@ export default function App() {
           </div>
 
           {/* Real product screenshot, not a mockup. */}
-          <div data-intro-shot className="relative left-1/2 mt-20 mb-4 w-[min(1320px,94vw)] -translate-x-1/2">
+          <div className="shot-rise relative left-1/2 mt-20 mb-4 w-[min(1320px,94vw)] -translate-x-1/2">
             <Shot
               src="/shot-workspace.png"
               alt="Lens answering three questions with the searchable chat history sidebar open; a LOCAL badge on each answer shows the model ran on this machine"
@@ -324,6 +328,6 @@ export default function App() {
           {VERSION} · Lens does not hide itself from screen sharing, by design.
         </p>
       </footer>
-    </div>
+    </>
   );
 }
