@@ -1,6 +1,6 @@
 {
   "name": "lens",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A screen and audio aware AI assistant that runs on your own machine.",
   "main": "out/main/main.js",
   "scripts": {

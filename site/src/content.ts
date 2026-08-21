@@ -5,7 +5,7 @@
 
 export const RELEASES = 'https://github.com/erfanulfarhan/lens/releases';
 export const REPO = 'https://github.com/erfanulfarhan/lens';
-export const VERSION = 'v0.1.3';
+export const VERSION = 'v0.1.4';
 
 export interface Target {
   label: string;
