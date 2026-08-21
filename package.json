@@ -25,6 +25,8 @@
     "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
     "png-to-ico": "^3.0.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "sharp": "^0.35.3",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.7.2",
@@ -34,9 +36,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",
     "mammoth": "^1.12.1",
-    "pdf-parse": "^2.4.5",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "pdfjs-dist": "^6.2.108"
   },
   "author": {
     "name": "Erfanul Hakim Farhan",
@@ -53,7 +53,13 @@
     "files": [
       "out/**/*",
       "build/icon.*",
-      "package.json"
+      "package.json",
+      "!node_modules/**/*.{map,ts,tsx,mts,cts,flow,coffee,md,markdown}",
+      "!node_modules/**/{test,tests,__tests__,spec,example,examples,doc,docs,.github,.idea}/**",
+      "!node_modules/**/{LICENSE,LICENCE,license,CHANGELOG,CHANGES,AUTHORS,NOTICE,README}*",
+      "!node_modules/pdfjs-dist/web/**",
+      "!node_modules/pdfjs-dist/image_decoders/**",
+      "!node_modules/@napi-rs/**"
     ],
     "extraResources": [
       {
@@ -171,7 +177,11 @@
       ]
     },
     "afterPack": "build/afterPack.cjs",
-    "copyright": "Copyright \u00a9 2026 Erfanul Hakim Farhan"
+    "copyright": "Copyright \u00a9 2026 Erfanul Hakim Farhan",
+    "compression": "maximum",
+    "electronLanguages": [
+      "en-US"
+    ]
   },
   "homepage": "https://github.com/erfanulfarhan/lens",
   "repository": {

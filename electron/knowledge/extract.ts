@@ -18,11 +18,39 @@ export async function extractText(path: string): Promise<string> {
   const ext = extname(path).toLowerCase()
 
   if (ext === '.pdf') {
-    const { PDFParse } = await import('pdf-parse')
-    const parser = new PDFParse({ data: new Uint8Array(await readFile(path)) })
-    const { text } = await parser.getText()
-    // pdf-parse v2 inserts a "-- N of M --" separator between pages; drop it.
-    return text.replace(/^-- \d+ of \d+ --$/gm, '').trim()
+    // pdfjs directly rather than through pdf-parse. pdf-parse depends on
+    // @napi-rs/canvas at a pinned version, which is 24MB of prebuilt native
+    // binaries for every platform and exists only to rasterise pages. This
+    // reads text and never renders, so the canvas is dead weight; for pdfjs the
+    // same package is optional, which lets the bundle leave it out.
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs')
+    // The loading task owns teardown, not the document proxy.
+    const task = pdfjs.getDocument({
+      data: new Uint8Array(await readFile(path)),
+      useSystemFonts: true,
+    })
+    const doc = await task.promise
+
+    const pages: string[] = []
+    for (let n = 1; n <= doc.numPages; n++) {
+      const content = await (await doc.getPage(n)).getTextContent()
+      const lines: string[] = []
+      let line = ''
+      for (const item of content.items) {
+        // Text items carry str; the marked-content items in between do not.
+        if ('str' in item) {
+          line += item.str
+          if (item.hasEOL) {
+            lines.push(line)
+            line = ''
+          }
+        }
+      }
+      if (line) lines.push(line)
+      pages.push(lines.join('\n'))
+    }
+    await task.destroy()
+    return pages.join('\n').trim()
   }
 
   if (ext === '.docx') {
