@@ -44,6 +44,13 @@ jobs:
       - run: npm run typecheck
       - run: npm test
 
+      # electron-vite compiles main, preload and renderer into out/. Without it
+      # electron-builder packages an asar with no entry file and every release
+      # run since 0.1.0 has died on the same sanity check. The local dist
+      # scripts chain the two; CI was calling electron-builder on its own.
+      - name: Compile main, preload and renderer
+        run: npm run build
+
       - name: Build installer
         # Unsigned for now. Set CSC_LINK/CSC_KEY_PASSWORD (macOS) or
         # WIN_CSC_LINK/WIN_CSC_KEY_PASSWORD (Windows) as repository secrets to sign.
