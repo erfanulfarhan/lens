@@ -42,17 +42,10 @@ const RULES: Array<{ os: Build['os']; icon: Build['icon']; label: string; detail
   { os: 'linux', icon: 'fedora', label: 'Fedora, RHEL', detail: '.rpm', test: (n) => /x86_64\.rpm$/i.test(n) },
 ];
 
-export async function fetchBuilds(): Promise<{ builds: Build[]; version: string | null }> {
-  try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached) as { at: number; builds: Build[]; version: string };
-      if (Date.now() - parsed.at < CACHE_MS) return { builds: parsed.builds, version: parsed.version };
-    }
-  } catch {
-    /* an unreadable cache is not an error */
-  }
+type Result = { builds: Build[]; version: string | null };
 
+/** Reads the live release and maps its assets onto the six download slots. */
+async function load(): Promise<Result> {
   try {
     const slug = REPO.split('github.com/')[1];
     const r = await fetch(`https://api.github.com/repos/${slug}/releases/latest`, {
@@ -86,6 +79,37 @@ export async function fetchBuilds(): Promise<{ builds: Build[]; version: string 
   } catch {
     return { builds: [], version: null };
   }
+}
+
+/**
+ * The six downloads for the current release.
+ *
+ * Cached for six hours so the buttons appear immediately and the page does not
+ * spend one of GitHub's sixty anonymous requests an hour on every visit. The
+ * cache is served first and then revalidated in the background: without that, a
+ * visitor who came by in the six hours before a release keeps being handed the
+ * previous version's installers, which is exactly the wrong moment to be stale.
+ *
+ * `onFresh` fires only when the network disagrees with what was served.
+ */
+export async function fetchBuilds(onFresh?: (r: Result) => void): Promise<Result> {
+  let cached: (Result & { at: number }) | null = null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Result & { at: number };
+      if (Date.now() - parsed.at < CACHE_MS) cached = parsed;
+    }
+  } catch {
+    /* an unreadable cache is not an error */
+  }
+
+  if (!cached) return load();
+
+  void load().then((fresh) => {
+    if (fresh.version && fresh.version !== cached!.version) onFresh?.(fresh);
+  });
+  return { builds: cached.builds, version: cached.version };
 }
 
 export const FALLBACK = RELEASES;

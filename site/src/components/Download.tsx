@@ -28,7 +28,11 @@ export function Download({ compact = false }: { compact?: boolean }) {
 
   useEffect(() => {
     let alive = true;
-    fetchBuilds().then(({ builds: b }) => alive && setBuilds(b));
+    // The second argument fires only if the background check finds a newer
+    // release than the cached one it already handed us.
+    fetchBuilds(({ builds: b }) => alive && setBuilds(b)).then(
+      ({ builds: b }) => alive && setBuilds(b),
+    );
     return () => {
       alive = false;
     };
