@@ -5,11 +5,10 @@ import { Reveal } from './components/Reveal';
 import { Words } from './components/Words';
 import { COLUMN, HEAD, RISE } from './lib/hero-motion';
 import { Rail } from './components/Rail';
-import { Typed } from './components/Typed';
 import { Download } from './components/Download';
 import { Shot } from './components/Shot';
 import { Faq } from './components/Faq';
-import { ASKED, LEDGER, REPO, SHOTS, STEPS, VERSION } from './content';
+import { LEDGER, REPO, SHOTS, STEPS, VERSION } from './content';
 
 /** Section shell: consistent rhythm, more space above a heading than below it. */
 type Band = 'violet' | 'azure' | 'jade' | 'amber' | 'rose';
@@ -67,80 +66,61 @@ export default function App() {
       <main>
         <section
           data-band="violet"
-          className="mx-auto w-full max-w-[1080px] px-6 pt-16 pb-2 sm:pt-24"
+          className="mx-auto w-full max-w-[1080px] px-6 pt-8 pb-2 sm:pt-10 [@media(max-height:720px)_and_(min-width:1024px)]:pt-2"
         >
           {/* Two columns rather than an overlay. Absolutely positioning the mark
               behind the headline ran the type straight through the metal, which
               read as an accident rather than a composition. */}
-          <div className="grid items-center gap-14 lg:grid-cols-[1fr_auto] lg:gap-16">
-          <motion.div initial="hidden" animate="show" variants={COLUMN}>
-            <motion.h1
-              variants={HEAD}
-              className="display max-w-[19ch] text-[clamp(2.5rem,6.4vw,4.9rem)] font-black"
-            >
-              <Words text="It reads your screen." />{' '}
-              {/* The treatment sits on the phrase, not each word, so a gradient
-                  across it is not restarted six times. */}
-              <span className="lit">
-                <Words text="Your machine keeps it." />
-              </span>
-            </motion.h1>
+          <div className="grid items-center gap-8 lg:grid-cols-[1fr_auto] lg:gap-14 [@media(max-height:720px)_and_(min-width:1024px)]:gap-4">
+            <motion.div initial="hidden" animate="show" variants={COLUMN}>
+              <motion.h1
+                variants={HEAD}
+                className="display max-w-[19ch] text-[clamp(2.4rem,5.9vw,4.4rem)] font-black [@media(max-height:720px)_and_(min-width:1024px)]:text-[2.85rem]"
+              >
+                <Words text="It reads your screen." />{' '}
+                {/* The treatment sits on the phrase, not each word, so a gradient
+                    across it is not restarted six times. */}
+                <span className="lit">
+                  <Words text="Your machine keeps it." />
+                </span>
+              </motion.h1>
 
-            {/* White light in, spectrum out: the reason the page changes colour. */}
-            <motion.div variants={RISE} className="mt-9 flex max-w-[34rem] items-center gap-1.5" aria-hidden>
-              <div className="beam w-1/3 origin-left" />
-              <Aperture size={18} animate={false} id="ap-prism" />
-              <div className="prism-out flex-1 origin-left" />
+              {/* White light in, spectrum out: the reason the page changes colour. */}
+              <motion.div
+                variants={RISE}
+                className="mt-7 flex max-w-[34rem] items-center gap-1.5"
+                aria-hidden
+              >
+                <div className="beam w-1/3 origin-left" />
+                <Aperture size={18} animate={false} id="ap-prism" />
+                <div className="prism-out flex-1 origin-left" />
+              </motion.div>
+
+              <motion.p
+                variants={RISE}
+                className="measure mt-6 text-[17px] leading-[1.7] text-[var(--muted)] sm:text-[18px] [@media(max-height:720px)_and_(min-width:1024px)]:mt-3 [@media(max-height:720px)_and_(min-width:1024px)]:text-[15.5px]"
+              >
+                Ask about your screen, about what was just said on a call, or about your own
+                files. The model runs on your computer: no subscription, nothing uploaded.
+              </motion.p>
             </motion.div>
 
-            {/* A mock composer, typing what people really ask it. */}
-            <motion.div variants={RISE} className="mt-7 max-w-[34rem] rounded-xl border border-[var(--line)] bg-[var(--panel)] px-4 py-3">
-              <p className="text-[15px] leading-[1.6] sm:text-[16px]">
-                <Typed lines={ASKED} />
-              </p>
-            </motion.div>
-
-            <motion.p variants={RISE} className="measure mt-7 text-[17px] leading-[1.7] text-[var(--muted)] sm:text-[18px]">
-              Ask about anything on screen, anything just said on a call, or anything in your own
-              documents. The model runs on your computer, so there is no subscription and nothing is
-              uploaded — the same idea as the assistants you rent, built the other way round.
-            </motion.p>
-
-            <motion.div variants={RISE} className="mt-11">
-              <Download />
-            </motion.div>
-          </motion.div>
-
-            {/* The mark opens once, alongside the claim it illustrates. Shown at
-                every width: hiding it below lg removed the page's one authored
-                moment from every phone. */}
-            <div className="pointer-events-none order-first justify-self-start lg:order-none lg:justify-self-end">
-              <span className="block lg:hidden">
-                <Aperture size={132} id="ap-hero-sm" />
-              </span>
-              <span className="hidden lg:block">
-                <Aperture size={248} id="ap-hero" />
-              </span>
+            {/* The mark opens once, alongside the claim it illustrates. Smaller
+                than it was: a grid row is as tall as its tallest cell, and at
+                248px the mark alone pushed the demo below the fold. */}
+            <div className="pointer-events-none hidden justify-self-end lg:block">
+              <Aperture size={188} id="ap-hero" />
             </div>
           </div>
 
-          {/* Real product screenshot, not a mockup. */}
-          <div className="shot-rise relative left-1/2 mt-14 w-[min(1320px,94vw)] -translate-x-1/2">
-            <Shot
-              src="/shot-workspace.png"
-              alt="Lens answering three questions with the searchable chat history sidebar open; a LOCAL badge on each answer shows the model ran on this machine"
-              width={2720}
-              height={1440}
-              priority
-              caption={
-                <>
-                  A real answer from a local model. The{' '}
-                  <span className="mono text-[11px]">LOCAL</span> badge is the app reporting that
-                  nothing in this exchange left the machine.
-                </>
-              }
-            />
-          </div>
+          {/* The app plays here, before anything is asked of the visitor. A
+              still image of a chat cannot show the one thing worth showing:
+              that the answer arrives, on this machine, in about a second. */}
+          <Demo />
+
+          <motion.div initial="hidden" animate="show" variants={RISE} className="mt-10">
+            <Download />
+          </motion.div>
         </section>
 
         <div className="rule mx-auto mt-12 max-w-[1080px]" />
@@ -219,11 +199,9 @@ export default function App() {
             ))}
           </ol>
 
-          <Demo />
-
-          {/* The real captures, each at its own proportions. Forcing three
+          {/* The real captures, each at its own proportions. Forcing several
               different shapes into one frame is what made them look cheap. */}
-          <div className="mt-16 flex flex-col gap-14">
+          <div className="mt-12 flex flex-col gap-14">
             {SHOTS.map((shot) => (
               <Shot key={shot.src} src={shot.src} alt={shot.alt} caption={shot.body} />
             ))}

@@ -139,7 +139,7 @@ export function Demo() {
   const word = THINKING_WORDS[(scene * 5 + Math.floor(elapsed / 420)) % THINKING_WORDS.length];
 
   return (
-    <div ref={box} className="mt-10">
+    <div ref={box} className="mt-8">
       <div className="relative">
         <div
           aria-hidden
@@ -165,8 +165,8 @@ export function Demo() {
 
           {/* Fixed height. The whole point of replacing the carousel was that
               the frame stops changing size, so the content cannot set it. */}
-          <div className="flex h-[236px] flex-col justify-between px-3.5 py-3.5 sm:h-[222px]">
-            <div className="flex min-h-0 flex-1 flex-col gap-3.5">
+          <div className="flex h-[268px] flex-col justify-between px-3.5 py-3.5 max-[420px]:h-[324px] sm:h-[220px] [@media(max-height:720px)_and_(min-width:1024px)]:h-[206px]">
+            <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
               <AnimatePresence>
                 {frame.sent && (
                   <motion.div

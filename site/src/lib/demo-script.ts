@@ -29,19 +29,19 @@ export const SCENES: Scene[] = [
     badge: 'LOCAL · SCREEN',
     sawScreen: true,
     answer: [
-      { lead: 'The port is taken.', rest: 'Something else is already listening on 5173.' },
-      { lead: 'Find it:', rest: 'lsof -i :5173 gives you the process id.' },
-      { lead: 'Then either', rest: 'stop that process, or start this one on 5174.' },
+      { lead: 'The port is taken.', rest: 'Something else holds 5173.' },
+      { lead: 'Find it with', rest: 'lsof -i :5173.' },
+      { lead: 'Then', rest: 'stop that process, or use 5174.' },
     ],
   },
   {
     label: 'Follows your calls',
-    question: 'They just asked how I handle a slipping deadline.',
+    question: 'They asked how I handle a slipping deadline.',
     badge: 'LOCAL · LISTENING',
     answer: [
-      { lead: 'Say it early.', rest: 'Flag the slip while there is still room to act.' },
-      { lead: 'Bring options.', rest: 'Cut scope, move the date, or add people.' },
-      { lead: 'Name the cost', rest: 'of each one, then let them choose.' },
+      { lead: 'Say it early.', rest: 'Flag it while there is room to act.' },
+      { lead: 'Bring options.', rest: 'Cut scope, move the date, add people.' },
+      { lead: 'Name the cost', rest: 'of each, then let them choose.' },
     ],
   },
   {
@@ -49,9 +49,9 @@ export const SCENES: Scene[] = [
     question: 'What does my contract say about notice?',
     badge: 'LOCAL · 3 DOCS',
     answer: [
-      { lead: 'Thirty days,', rest: 'in writing, either side. Clause 8.2.' },
-      { lead: 'Garden leave', rest: 'is at their discretion, not yours.' },
-      { lead: 'Untaken holiday', rest: 'is paid out on the final day.' },
+      { lead: 'Thirty days,', rest: 'in writing. Clause 8.2.' },
+      { lead: 'Garden leave', rest: 'is their call, not yours.' },
+      { lead: 'Unused holiday', rest: 'is paid on the last day.' },
     ],
   },
 ];

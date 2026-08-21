@@ -1,9 +1,9 @@
 import type { Scene } from './demo-script';
 
 /** Per-character typing speed, and per-word streaming speed, in ms. */
-const TYPE_MS = 34;
+const TYPE_MS = 26;
 const SEND_MS = 260;
-const THINK_MS = 1250;
+const THINK_MS = 900;
 const WORD_MS = 46;
 const HOLD_MS = 2500;
 

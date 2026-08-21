@@ -97,7 +97,7 @@ export const FAQ = [
   },
   {
     q: 'Is it actually free, or free for now?',
-    a: 'Actually free. There is no account, no trial and no server bill to eventually pass on to you — the model runs on your own hardware, so the only running cost is your electricity. There is no paid tier held back for later.',
+    a: 'Actually free. There is no account, no trial and no server bill to eventually pass on to you. The model runs on your own hardware, so the only running cost is your electricity. There is no paid tier held back for later.',
   },
   {
     q: 'Does anything leave my computer?',
@@ -113,7 +113,7 @@ export const FAQ = [
   },
   {
     q: 'Can it listen to calls on Windows or Linux?',
-    a: 'Not yet. Call transcription uses a small Swift helper built against ScreenCaptureKit, which has no equivalent on other platforms. Everything else — screen questions, documents, memory, web search — works everywhere.',
+    a: 'Not yet. Call transcription uses a small Swift helper built against ScreenCaptureKit, which has no equivalent on other platforms. Everything else works everywhere: screen questions, documents, memory and web search.',
   },
 ];
 
@@ -125,6 +125,12 @@ export const FAQ = [
  * model I already pay for, and does it work before I have set anything up.
  */
 export const SHOTS = [
+  {
+    src: '/shot-workspace.png',
+    alt: 'Lens answering three questions with the searchable chat history sidebar open; a LOCAL badge on each answer shows the model ran on this machine',
+    title: 'Everything you asked, kept',
+    body: 'Chat history is searchable and stays on the machine. The LOCAL badge on each answer is the app reporting that the exchange never left it.',
+  },
   {
     src: '/shot-answer.png',
     alt: 'The Lens panel answering a question, showing the model in use and the local status badge',
