@@ -1,8 +1,8 @@
 interface Props {
   src: string;
   alt: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   /** The hero shot loads eagerly; the rest wait. */
   priority?: boolean;
   caption?: React.ReactNode;

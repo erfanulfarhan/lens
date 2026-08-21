@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Aperture } from './components/Aperture';
-import { Carousel } from './components/Carousel';
+import { Demo } from './components/Demo';
 import { Reveal } from './components/Reveal';
 import { Words } from './components/Words';
 import { COLUMN, HEAD, RISE } from './lib/hero-motion';
@@ -32,7 +32,7 @@ function Section({
     <section
       id={id}
       data-band={band}
-      className="mx-auto w-full max-w-[1080px] px-6 pt-32 sm:pt-40"
+      className="mx-auto w-full max-w-[1080px] px-6 pt-20 sm:pt-24"
     >
       <Reveal tag="h2" className="display max-w-[26ch] text-[2.1rem] font-extrabold sm:text-[2.9rem]">
         {heading}
@@ -67,7 +67,7 @@ export default function App() {
       <main>
         <section
           data-band="violet"
-          className="mx-auto w-full max-w-[1080px] px-6 pt-16 pb-8 sm:pt-24"
+          className="mx-auto w-full max-w-[1080px] px-6 pt-16 pb-2 sm:pt-24"
         >
           {/* Two columns rather than an overlay. Absolutely positioning the mark
               behind the headline ran the type straight through the metal, which
@@ -125,7 +125,7 @@ export default function App() {
           </div>
 
           {/* Real product screenshot, not a mockup. */}
-          <div className="shot-rise relative left-1/2 mt-20 mb-4 w-[min(1320px,94vw)] -translate-x-1/2">
+          <div className="shot-rise relative left-1/2 mt-14 w-[min(1320px,94vw)] -translate-x-1/2">
             <Shot
               src="/shot-workspace.png"
               alt="Lens answering three questions with the searchable chat history sidebar open; a LOCAL badge on each answer shows the model ran on this machine"
@@ -143,7 +143,7 @@ export default function App() {
           </div>
         </section>
 
-        <div className="rule mx-auto mt-24 max-w-[1080px]" />
+        <div className="rule mx-auto mt-12 max-w-[1080px]" />
 
         {/* -------------------------------------------------- honest "proof" */}
         <Section
@@ -152,7 +152,7 @@ export default function App() {
           heading="No testimonials yet. Here is what is true instead."
           lede="Lens is new, so there is no wall of logos to show you and none will be invented here. What can be checked is checkable: the builds exist, the code is readable, and the privacy claims are specific rather than reassuring."
         >
-          <dl className="mt-14 border-t border-[var(--line)]">
+          <dl className="mt-10 border-t border-[var(--line)]">
             {LEDGER.map((row) => (
               <div
                 key={row.fact}
@@ -189,7 +189,7 @@ export default function App() {
           heading="Three steps, then a keyboard shortcut."
           lede="The only genuine setup cost is choosing a model, and Lens does that part for you."
         >
-          <ol className="mt-14 list-none p-0">
+          <ol className="mt-10 list-none p-0">
             {STEPS.map((step, i) => (
               <li
                 key={step.title}
@@ -219,8 +219,14 @@ export default function App() {
             ))}
           </ol>
 
-          <div className="relative left-1/2 mt-24 w-[min(1320px,94vw)] -translate-x-1/2">
-            <Carousel slides={SHOTS} />
+          <Demo />
+
+          {/* The real captures, each at its own proportions. Forcing three
+              different shapes into one frame is what made them look cheap. */}
+          <div className="mt-16 flex flex-col gap-14">
+            {SHOTS.map((shot) => (
+              <Shot key={shot.src} src={shot.src} alt={shot.alt} caption={shot.body} />
+            ))}
           </div>
 
         </Section>
@@ -232,7 +238,7 @@ export default function App() {
           heading="It costs nothing, and that is not a trial."
           lede="There is no server between you and the model, so there is no bill to pass on. That is the whole pricing story."
         >
-          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-[var(--line)] sm:grid-cols-2">
+          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-[var(--line)] sm:grid-cols-2">
             <div className="p-9" style={{ background: 'var(--panel)' }}>
               <h3 className="text-[1.16rem] font-semibold tracking-wide uppercase">Lens</h3>
               <p className="display mt-5 text-[3.6rem] leading-none font-black text-[var(--brass)]">
@@ -324,7 +330,7 @@ export default function App() {
             </div>
           </div>
         </div>
-        <p className="mt-14 text-[12.5px] text-[var(--faint)]">
+        <p className="mt-10 text-[12.5px] text-[var(--faint)]">
           {VERSION} · Lens does not hide itself from screen sharing, by design.
         </p>
       </footer>
