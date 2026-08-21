@@ -64,6 +64,8 @@ jobs:
           path: |
             dist/*.dmg
             dist/*.exe
+            dist/nsis-web/*.exe
+            dist/nsis-web/*.7z
             dist/*.AppImage
             dist/*.deb
             dist/*.rpm
@@ -82,7 +84,7 @@ jobs:
         # "Lens Setup 0.1.4.exe" and an unquoted $(find ...) splits that name on
         # its spaces into three arguments that match nothing.
         run: |
-          find artifacts -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -print0 \
+          find artifacts -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.nsis.7z' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -print0 \
             | xargs -0 gh release upload "${GITHUB_REF_NAME}" --clobber --repo "$GITHUB_REPOSITORY"
         env:
           GH_TOKEN: ${{ github.token }}

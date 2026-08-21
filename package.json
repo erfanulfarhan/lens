@@ -1,6 +1,6 @@
 {
   "name": "lens",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A screen and audio aware AI assistant that runs on your own machine.",
   "main": "out/main/main.js",
   "scripts": {
@@ -129,7 +129,7 @@
       "icon": "build/icon.ico",
       "target": [
         {
-          "target": "nsis",
+          "target": "nsis-web",
           "arch": [
             "x64"
           ]
@@ -181,6 +181,13 @@
     "compression": "maximum",
     "electronLanguages": [
       "en-US"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "erfanulfarhan",
+        "repo": "lens"
+      }
     ]
   },
   "homepage": "https://github.com/erfanulfarhan/lens",

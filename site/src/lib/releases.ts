@@ -36,7 +36,13 @@ const CACHE_MS = 6 * 60 * 60 * 1000;
 const RULES: Array<{ os: Build['os']; icon: Build['icon']; label: string; detail: string; test: (n: string) => boolean }> = [
   { os: 'mac', icon: 'mac', label: 'macOS', detail: 'Apple Silicon', test: (n) => /arm64\.dmg$/i.test(n) },
   { os: 'mac', icon: 'mac', label: 'macOS', detail: 'Intel', test: (n) => /\.dmg$/i.test(n) },
-  { os: 'windows', icon: 'windows', label: 'Windows', detail: 'Installer', test: (n) => /\.exe$/i.test(n) },
+  {
+    os: 'windows',
+    icon: 'windows',
+    label: 'Windows',
+    detail: 'Web installer',
+    test: (n) => /\.exe$/i.test(n),
+  },
   { os: 'linux', icon: 'linux', label: 'Linux', detail: 'AppImage', test: (n) => /\.AppImage$/i.test(n) && !/arm64/i.test(n) },
   { os: 'linux', icon: 'debian', label: 'Debian, Ubuntu', detail: '.deb', test: (n) => /amd64\.deb$/i.test(n) },
   { os: 'linux', icon: 'fedora', label: 'Fedora, RHEL', detail: '.rpm', test: (n) => /x86_64\.rpm$/i.test(n) },
