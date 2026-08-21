@@ -5,9 +5,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b --noEmit false && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name getlens"
   },
-  "dependencies": { "react": "^19.0.0", "react-dom": "^19.0.0" },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.0.2",
